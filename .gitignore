@@ -195,3 +195,4 @@ cython_debug/
 .DS_Store
 ms/endorsement.aux
 ms/endorsement.out
+ms/endorsement.log
