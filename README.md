@@ -4,63 +4,64 @@
 
 * [Manuscript (pdf and .tex)](ms/)
 
-## The Problem: Misinterpreting Endorsement Experiments
+## The Problem: Endorsement Experiments Are Underidentified
 
-Blair et al. (2013) conducted influential endorsement experiments in Pakistan and concluded:
+Blair et al. (2013) conducted endorsement experiments in Pakistan and concluded:
 
 > "We find that Pakistanis in general are **weakly negative** toward Islamist militant organizations."
 
 > "The coefficients are negative and statistically significant...suggesting that **Pakistanis hold militant groups in low regard**."
 
-**These interpretations are wrong.**
+**This interpretation is incomplete.**
 
-With 80% baseline policy support and a -0.011 treatment effect, the data actually imply **78.9% of Pakistanis support militant groups**. The negative sign of the coefficient reflects the balance of switchers, not the level of support.
+The sign of the average treatment effect (ATE) tells us the balance of switchers, not the level of support. With 80% baseline policy support and a -0.011 treatment effect, implied support for militant groups ranges from **39% to 99%** depending on assumptions about individual switching behavior:
 
-See the [detailed reinterpretation notebook](scripts/blair_reinterpretation.ipynb) and [manuscript](ms/endorsement.pdf) for the full analysis.
+| Model | Assumption | Implied Support |
+|-------|------------|-----------------|
+| Symmetric effects | Both groups shift ±0.05 | 39% |
+| Binary switching | All supporters → 1, opponents → 0 | 79% |
+| Extreme reaction | Opponents react maximally | 99% |
+
+No model supports Blair et al.'s characterization of "low regard." But the precise level of support is sensitive to assumptions the data cannot adjudicate.
+
+See the [manuscript](ms/endorsement.pdf) for the full analysis.
 
 ## Overview
 
-Endorsement experiments measure how group endorsements affect policy support, but interpreting the results to infer actual support for the endorsing group is complex. This toolkit provides:
+Endorsement experiments identify the ATE under standard exclusion restrictions, but the ATE alone does not identify the proportion of supporters. This toolkit provides:
 
-- **Theoretical bounds** on supporter proportions under different assumptions
+- **Bounds under different behavioral models** (binary switching, symmetric effects, etc.)
 - **Baseline support analysis** using constant terms from regressions
-- **Continuous effects modeling** for non-binary outcomes
-- **Policy selection guidance** for optimal experimental design
+- **Variance tests** for the binary switching assumption
+- **Sensitivity analysis** across the range of plausible models
 - **Visualization tools** for publication-ready figures
 
 ## Quick Start
 
 ### Option 1: Quick Analysis Script
-For immediate analysis of your results:
-
 ```python
 # Modify these parameters in endorsement_quick_analysis.py
 YOUR_ATE = -0.011              # Your treatment effect
-YOUR_CONSTANT = 0.8            # Your baseline support (if available)
+YOUR_CONSTANT = 0.8            # Your baseline support
 YOUR_SAMPLE_SIZE = 1500        # Your sample size
-YOUR_GROUP_NAME = "militant groups"
-YOUR_POLICY_NAME = "infrastructure policies"
 
 # Run analysis
-python endorsement_quick_analysis.py
+python3 endorsement_quick_analysis.py
 ```
 
 ### Option 2: Interactive Analysis
-Use the main notebook for detailed exploration:
-
 ```python
 from endorsement_analysis_notebook import EndorsementAnalyzer
 
 # Initialize with your experimental results
 analyzer = EndorsementAnalyzer(ate=-0.011, constant_term=0.8)
 
-# Get baseline analysis (most important!)
-results = analyzer.baseline_support_analysis()
-print(f"Proportion supporting group: {results['proportion_supporters']:.1%}")
+# Get estimates under different models
+baseline = analyzer.baseline_support_analysis()
+print(f"Binary switching estimate: {baseline['proportion_supporters']:.1%}")
 
-# Compare with binary framework
-binary_results = analyzer.binary_framework_bounds()
-print(f"Binary framework max: {binary_results['p_max']:.1%}")
+binary = analyzer.binary_framework_bounds()
+print(f"Binary (no baseline) max: {binary['p_max']:.1%}")
 ```
 
 ## File Structure
@@ -68,150 +69,99 @@ print(f"Binary framework max: {binary_results['p_max']:.1%}")
 ```
 ├── ms/endorsement.tex                          # Manuscript with full theoretical framework
 ├── scripts/blair_reinterpretation.ipynb        # Blair et al. critique notebook
-├── scripts/endorsement_analysis_notebook.py    # Main analysis classes and functions
-├── scripts/endorsement_utils.py                # Utility functions and calculations
+├── scripts/endorsement_analysis_notebook.py    # Main analysis classes
+├── scripts/endorsement_utils.py                # Utility functions
 ├── scripts/endorsement_viz.py                  # Visualization tools
 ├── scripts/endorsement_quick_analysis.py       # Quick analysis script
-└── README.md                                   # This file
+├── scripts/generate_tables_and_figures.py      # Generates tabs/ and figs/
+├── tabs/                                       # LaTeX tables for manuscript
+├── figs/                                       # Figures for manuscript
+└── README.md
 ```
 
 ## Key Methods
 
-### 1. Binary Framework
-**When to use:** Basic bounds without baseline information
+### 1. Binary Switching
+**Assumption:** All supporters end up at 1, all opponents at 0 in treatment.
 ```python
-p_max = (ate + 1) / 2
+proportion_supporters = constant_term + ate  # = 0.80 - 0.011 = 78.9%
+```
+**Testable implication:** Treatment group variance should equal p(1-p) ≈ 0.166. If observed variance is much lower, binary switching is rejected.
+
+### 2. Symmetric Effects
+**Assumption:** Supporters shift by +d, opponents by -d.
+```python
+p = ate / (2 * d) + 0.5  # With d=0.05: -0.011/0.1 + 0.5 = 39%
 ```
 
-### 2. Baseline Support Analysis ⭐ **MOST IMPORTANT**
-**When to use:** When you have the constant term from your regression
+### 3. Extreme Opponent Reaction
+**Assumption:** Opponents react maximally (δ = -1), supporters unaffected (δ = 0).
 ```python
-proportion_supporters = constant_term + ate
+p = 1 + ate  # = 1 - 0.011 = 98.9%
 ```
 
-**Why it matters:** This can dramatically change interpretation. In Blair et al. (2013):
-- Binary framework: Max 49.5% supporters
-- Baseline analysis: **78.9% supporters** 
-
-### 3. Continuous Effects
-**When to use:** Non-binary outcomes (e.g., 5-point scales)
-- Extreme scenario: `p_max = 1 + ate` (if opponents react maximally)
-- Symmetric effects: `p = ate/(2×effect_size) + 0.5`
-
-### 4. Policy Selection Scoring
-**When to use:** Designing new endorsement experiments
+### 4. Without Baseline Information
+If only the ATE is available (no constant term):
 ```python
-score = analyzer.policy_selection_score(
-    baseline_support=0.85,     # 80-90% optimal
-    ideological_score=0.9,     # Higher = more neutral
-    plausibility_score=0.8     # Higher = more believable
-)
+p_max = (ate + 1) / 2  # = 49.5%
+```
+This is far less informative than using baseline support.
+
+## The Identification Problem
+
+The ATE decomposes as:
+```
+β = p × δ⁺ + (1-p) × δ⁻
 ```
 
-## Reinterpreting Blair et al. (2013)
+Three unknowns (p, δ⁺, δ⁻), one equation. The system is underidentified without restrictions on switching behavior. Different assumptions yield very different estimates:
 
-**Study:** Pakistani attitudes toward militant groups via policy endorsements
+| Without Baseline | With Baseline (α=0.8) | Model |
+|------------------|----------------------|-------|
+| Max 49.5% | 39% | Symmetric (d=0.05) |
+| Max 49.5% | 79% | Binary switching |
+| Max 49.5% | 99% | Extreme reaction |
 
-**Their data:**
-- Baseline policy support (constant): 0.80
-- Treatment effect (ATE): -0.011
-- Strongest effect (Afghan Taliban): -0.015
+**Key insight:** Baseline information is crucial and routinely ignored.
 
-**Blair et al.'s interpretation:**
-> "Pakistanis hold militant groups in low regard"
+## Guidance for Practitioners
 
-**Correct interpretation:**
-- Treatment group average = 0.80 - 0.011 = **78.9%**
-- Under binary switching, this equals the proportion of supporters
-- **78.9% of Pakistanis support militant groups**
+1. **Report treatment group averages, not just ATEs.** Under binary switching, the treatment average directly estimates the supporter proportion.
 
-Even for the Afghan Taliban (strongest effect): 0.80 - 0.015 = **78.5% support**
+2. **Do not equate the ATE sign with "sentiment."** The sign tells you which switching force dominates, not whether the group is popular.
 
-```python
-from endorsement_analysis_notebook import EndorsementAnalyzer
+3. **Discuss identifying assumptions explicitly.** Present sensitivity analyses across plausible behavioral models.
 
-analyzer = EndorsementAnalyzer(ate=-0.011, constant_term=0.8)
-result = analyzer.baseline_support_analysis()
-print(f"Proportion supporters: {result['proportion_supporters']:.1%}")  # 78.9%
-```
-
-## Understanding the Results
-
-### When Baseline Info Changes Everything
-
-| Scenario | Without Baseline | With Baseline (α=0.8) | Interpretation |
-|----------|------------------|----------------------|----------------|
-| ATE = -0.01 | Max 49.5% support | **78.9% support** | Majority support despite negative ATE |
-| ATE = -0.05 | Max 47.5% support | **75% support** | Still majority support |
-| ATE = +0.01 | Max 50.5% support | **80.1% support** | Strong majority support |
-
-### Why This Happens
-- **High baseline support** (α = 0.8) means 80% support policy in control
-- **Small negative ATE** (β = -0.011) means treatment drops to 78.9%  
-- Under **binary switching**: treatment group average = proportion of supporters
-- **Result:** 78.9% are supporters who always support when their group endorses
+4. **Test the binary switching assumption.** Compare treatment variance to p(1-p). Large discrepancies indicate binary switching is inappropriate.
 
 ## Policy Selection Guidelines
 
-### ✅ Good Policies for Endorsement Experiments
-- **Infrastructure development** (baseline ~85%, neutral, plausible)
-- **Public health programs** (baseline ~88%, neutral, plausible)
-- **Education funding** (baseline ~82%, neutral, plausible)
+Optimal policies for endorsement experiments should have:
+- **Baseline support: 80-90%** (room for opponents to move)
+- **Ideological neutrality** (public goods, not partisan issues)
+- **Plausible endorsement** (group could realistically support it)
+- **Avoid ceiling effects** (not >95% support)
 
-### ❌ Poor Policies
-- **Military spending** (ideologically polarized)
-- **Universal healthcare** (ideologically polarized)  
-- **Gun control** (low baseline, polarized)
+### Good Policies
+- Infrastructure development
+- Public health programs (polio vaccination)
+- Education funding
 
-### Optimal Characteristics
-1. **Baseline support: 80-90%** (room for opponents to move)
-2. **Ideologically neutral** (public goods, not partisan issues)
-3. **Plausible endorsement** (group could realistically support it)
-4. **Avoid ceiling effects** (not >95% support)
+### Poor Policies
+- Military spending (ideologically polarized)
+- Taxation policy (partisan)
+- Gun control (low baseline, polarized)
 
-## Advanced Usage
-
-### Simulation for Heterogeneous Effects
-```python
-# Simulate individual-level heterogeneity
-sim_results = analyzer.simulate_heterogeneous_effects(
-    effect_distribution='normal',
-    std=0.05
-)
-print(f"Positive shifters: {sim_results['proportion_positive']:.1%}")
-```
-
-### Sensitivity Analysis
-```python
-# Test robustness across ATE range
-ate_range = np.linspace(-0.05, 0.05, 50)
-sensitivity_df = sensitivity_analysis(ate_range, constant_term=0.8)
-```
-
-### Optimization (for continuous outcomes)
-```python
-# Find maximum positive shifters using Hungarian algorithm
-control_responses = generate_realistic_responses(100)['control']
-treatment_responses = generate_realistic_responses(100)['treatment'] 
-optimal_result = hungarian_optimization(control_responses, treatment_responses)
-```
-
-## Visualization Examples
+## Visualization
 
 ```python
 from endorsement_viz import *
 
-# Comprehensive bounds comparison
+# Compare estimates across methods
 fig1 = plot_bounds_comparison(ate=-0.011, constant_term=0.8)
 
-# Blair et al. replication with all details
-fig2 = plot_blair_replication()
-
-# Policy selection guidance
-fig3 = plot_policy_selection_guide()
-
-# Sensitivity analysis
-fig4 = plot_sensitivity_analysis(np.linspace(-0.05, 0.05, 50), constant_term=0.8)
+# Sensitivity to ATE
+fig2 = plot_sensitivity_analysis(np.linspace(-0.05, 0.05, 50), constant_term=0.8)
 ```
 
 ## Dependencies
@@ -222,24 +172,14 @@ pip install numpy pandas matplotlib seaborn scipy
 
 ## Citation
 
-If you use this toolkit, please cite:
-
 ```
 Sood, Gaurav. (2025). Inferring Support from Endorsement Experiments.
 ```
 
 ## Key Takeaways
 
-1. **Baseline support information is crucial** - it can completely change your interpretation
-2. **Small negative ATEs don't necessarily mean opposition** when baseline support is high
-3. **Policy selection matters** - choose policies with 80-90% baseline support and ideological neutrality
-4. **Binary switching models provide clean theoretical foundations** before extending to continuous outcomes
-5. **External validation is important** - compare your estimates with other measures of support
-
-## Common Mistakes to Avoid
-
-❌ **Interpreting ATE alone** without considering baseline support
-❌ **Using polarized policies** that confound group and ideological effects  
-❌ **Assuming symmetric effects** without theoretical justification
-❌ **Ignoring sample size** in power calculations
-❌ **Focusing only on statistical significance** rather than substantive interpretation
+1. **Endorsement experiments are underidentified** for the proportion of supporters without behavioral assumptions
+2. **Baseline support information is crucial** and changes estimates dramatically
+3. **The ATE sign does not measure "sentiment"** - it measures the balance of switchers
+4. **Report ranges, not point estimates** unless you can defend a specific behavioral model
+5. **Binary switching is testable** via the variance implication - and often rejected
