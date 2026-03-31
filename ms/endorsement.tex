@@ -19,6 +19,7 @@
 \usepackage{geometry}  % see geometry.pdf on how to lay out the page. There's lots.
 \geometry{letterpaper} % This is 8.5x11 paper. Options are a4paper or a5paper or other...
 \usepackage{graphicx}  % Handles inclusion of major graphics formats and allows use of
+\graphicspath{{../figs/}}
 \usepackage{units}
 \usepackage{amsfonts,amsmath,amsbsy}
 \usepackage{amsxtra}
@@ -54,17 +55,15 @@
 \usepackage{pdfpages}
 
 % https://tex.stackexchange.com/questions/611786/misplaced-noalign-because-input-before-booktabs-rule
-% I was getting Misplaced \noalign. \bottomrule on my laptop
-% but not on my desktop...
-% Comment out for older LaTeX versions
-%\iffalse
+% Comment out for newer LaTeX versions (2025+) where this is already defined
+\iffalse
 \ExplSyntaxOn
 \cs_new:Npn \expandableinput #1
 { \use:c { @@input } { \file_full_name:n {#1} } }
 \AddToHook{env/tabular/begin}
 { \cs_set_eq:NN \input \expandableinput }
 \ExplSyntaxOff
-%\fi
+\fi
 
 
 \usepackage[nameinlink, capitalize, noabbrev]{cleveref}
@@ -96,7 +95,7 @@
 % Caption
 \usepackage[
     skip            =0pt,
-    labelfont       =bf, 
+    labelfont       =bf,
     font            =small,
     textfont        =small,
     figurename      =Figure,
@@ -140,418 +139,284 @@
 
 \section{Introduction}
 
-Endorsement experiments are a popular tool in political science and survey research to estimate latent attitudes toward controversial political actors, such as militant groups or unpopular politicians. These experiments randomly assign a group endorsement to a policy and measure how the endorsement affects respondents' support for the policy. While researchers typically report the average treatment effect (ATE), interpreting what this aggregate measure reveals about the distribution of attitudes toward the endorsing group is nontrivial.
+Blair et al. (2013) conclude that Pakistanis hold militant groups in ``low regard'' based on small negative treatment effects from endorsement experiments. This interpretation is wrong. Their own data, properly analyzed, are consistent with 79\% of Pakistanis \emph{supporting} militant groups.
 
-This paper develops a framework for inferring bounds on support for endorsing groups from observed treatment effects. We show how to derive theoretical limits on the proportion of supporters and present computational methods for estimating empirical bounds using optimization techniques.
+The error stems from conflating the sign of the average treatment effect (ATE) with the level of support for the endorsing group. A negative ATE indicates that more people switched away from the policy than toward it when the militant group endorsed it. But this tells us about the \emph{balance} of switchers, not the \emph{level} of support. With high baseline policy support, a small negative effect is fully consistent with majority support for the endorsing group.
 
-\section{Basic Framework and Assumptions}
+We develop a framework for inferring support from endorsement experiments that uses both the treatment effect and baseline support information. The key result is simple: under standard assumptions, the treatment group average directly equals the proportion of supporters. Applying this to Blair et al.'s data---where baseline support is 80\% and the treatment effect is $-1.1$ percentage points---yields 78.9\% support for militant groups, not the ``low regard'' they report.
 
-\subsection{Setup}
-Consider a standard between-subjects endorsement experiment where respondents are randomly assigned to either:
+This paper proceeds as follows. Section 2 reviews endorsement experiments and the standard interpretation problem. Section 3 develops our inferential framework. Section 4 applies it to Blair et al. (2013). Section 5 examines robustness to alternative assumptions. Section 6 discusses implications for practitioners. Section 7 concludes.
+
+\section{Background: Endorsement Experiments}
+
+\subsection{Design}
+
+Endorsement experiments measure latent attitudes toward controversial actors by randomizing whether a group endorses a policy. In a standard between-subjects design, respondents see either:
 \begin{itemize}
 \item \textbf{Treatment}: ``Do you support this policy? [Group Y endorses this policy.]''
 \item \textbf{Control}: ``Do you support this policy?''
 \end{itemize}
 
-We assume respondents fall into two categories with binary policy preferences:
+The identifying assumption is that the endorsement affects policy support only through respondents' attitudes toward the endorsing group. Supporters of the group should increase their policy support; opponents should decrease theirs.
+
+\subsection{Standard Interpretation}
+
+Researchers typically report the average treatment effect and interpret its sign as indicating ``sentiment'' toward the endorsing group. A negative ATE is taken to mean respondents view the group unfavorably; a positive ATE suggests favorable attitudes.
+
+This interpretation is incomplete. The ATE reflects the net effect of two countervailing forces: supporters increasing their policy support and opponents decreasing theirs. The sign tells us which force dominates, but not by how much---and crucially, not what proportion of the population falls into each category.
+
+\subsection{The Interpretation Problem}
+
+Consider an ATE of $-0.01$ (a 1 percentage point decrease in policy support). This could arise from:
 \begin{itemize}
-\item \textbf{Supporters} (proportion $p$): Switch from opposing to supporting the policy when their favored group endorses it (effect: $0 \to 1$, so $\delta = +1$)
-\item \textbf{Opponents} (proportion $1-p$): Switch from supporting to opposing the policy when the disliked group endorses it (effect: $1 \to 0$, so $\delta = -1$)
+\item 51\% opponents each reducing support slightly, 49\% supporters each increasing support slightly
+\item 1\% opponents dramatically reducing support, 99\% supporters unaffected
+\item Many other combinations
 \end{itemize}
 
-In this binary framework, the individual treatment effect $\delta_i \in \{-1, 0, +1\}$ represents whether respondent $i$ switches their binary support/oppose response due to the endorsement.
+Without additional information, the ATE alone cannot distinguish these scenarios. The sign of the effect tells us the balance of switchers tilts toward opponents, but says nothing about the absolute level of support for the endorsing group.
 
-\subsection{Symmetric Effects Model}
-Under the binary switching assumption, the ATE can be written as:
-\begin{align}
-\text{ATE} &= p \cdot (+1) + (1 - p) \cdot (-1) \label{eq:ate_basic}\\
-&= p - (1-p) = 2p - 1 \label{eq:ate_simplified}
-\end{align}
+\section{A Framework for Inference}
 
-Solving for $p$, the proportion of group supporters:
-\begin{align}
-p &= \frac{\text{ATE} + 1}{2} \label{eq:p_solve}
-\end{align}
+\subsection{Setup}
 
-This binary framework provides a clean interpretation: the ATE directly maps to the difference between supporters and opponents, with $\text{ATE} = 0$ indicating equal proportions ($p = 0.5$).
+We model respondents as falling into two categories based on their attitudes toward the endorsing group:
+\begin{itemize}
+\item \textbf{Supporters} (proportion $p$): Those who view the group favorably
+\item \textbf{Opponents} (proportion $1-p$): Those who view the group unfavorably
+\end{itemize}
 
-\section{Adjusting for Partial Awareness}
+In the binary switching model, supporters switch from opposing to supporting the policy when their favored group endorses it ($\delta = +1$), while opponents switch from supporting to opposing ($\delta = -1$).
 
-In many contexts, not all respondents have strong opinions about the endorsing group. Let $q$ represent the fraction of the population with genuine attitudes toward the group. Under the binary switching model:
+\subsection{The Key Result}
 
-\begin{align}
-\text{ATE} &= q \cdot (2p - 1) \label{eq:ate_partial}
-\end{align}
-
-Where $p$ now represents the proportion of \emph{opinion-holders} who support the group. Solving for $p$:
-\begin{align}
-p &= \frac{\text{ATE}}{2q} + \frac{1}{2} \label{eq:p_partial}
-\end{align}
-
-\subsection{Example: Militant Group Support in Pakistan}
-Consider an endorsement experiment with $\text{ATE} = -0.011$. If we assume that 70\% of respondents have genuine opinions about militant groups ($q = 0.7$), then:
-
-\begin{align}
-p &= \frac{-0.011}{2 \times 0.7} + 0.5 = \frac{-0.011}{1.4} + 0.5 \approx 0.492
-\end{align}
-
-This suggests that approximately 49.2\% of opinion-holders support the group—indicating slight net opposition, but nearly balanced attitudes among those with genuine opinions.
-
-\section{Incorporating Baseline Support Information}
-
-\subsection{Additional Constraints from Constant Term}
-When we observe both the constant term ($\alpha$) and treatment effect ($\beta$) from the regression:
+When we observe both the baseline support level (constant term $\alpha$) and the treatment effect ($\beta$) from the regression
 \begin{align}
 \text{Support} = \alpha + \beta \cdot \text{Treatment} + \varepsilon
 \end{align}
+the treatment group average provides direct information about supporter proportions.
 
-The constant term provides crucial additional information. If $\alpha = 0.8$ and $\beta = -0.011$, then:
-\begin{itemize}
-\item Control group average support = 0.8
-\item Treatment group average support = 0.8 - 0.011 = 0.789
-\end{itemize}
-
-\subsection{Exact Solution Under Binary Complete Switching}
-In our binary framework where supporters always switch (0→1) and opponents always switch (1→0), the analysis becomes straightforward:
-
-\begin{itemize}
-\item \textbf{Supporters in treatment:} Always end up at 1 (regardless of baseline)
-\item \textbf{Opponents in treatment:} Always end up at 0 (regardless of baseline)  
-\end{itemize}
-
-Therefore, the treatment group average equals the proportion of supporters:
+Under the binary switching assumption where supporters always end up at 1 and opponents always end up at 0:
 \begin{align}
-\text{Treatment average} &= p \cdot 1 + (1-p) \cdot 0 = p \\
-0.789 &= p
+\text{Treatment average} &= p \cdot 1 + (1-p) \cdot 0 = p
 \end{align}
 
-\textbf{Result: Exactly 78.9\% are supporters} under complete binary switching.
+The treatment group average equals the proportion of supporters.
 
-This is dramatically higher than our previous bound of 49.45\% because we now use information about baseline support levels, not just the treatment effect.
+\subsection{Derivation}
 
-\subsection{Intuition}
-The high baseline support (80\%) combined with a small negative treatment effect (-1.1 percentage points) is consistent with most people being supporters of the group. The slight decrease in average support occurs because:
+Consider the mechanics. In the control group, respondents report their policy preferences without the endorsement cue, yielding average support $\alpha$. In the treatment group:
 \begin{itemize}
-\item 78.9\% are supporters → always support policy in treatment
-\item 21.1\% are opponents → always oppose policy in treatment  
-\item Net effect: 78.9\% - 80\% = -1.1 percentage points
+\item Supporters learn their favored group endorses the policy $\rightarrow$ support it (outcome = 1)
+\item Opponents learn a disliked group endorses the policy $\rightarrow$ oppose it (outcome = 0)
 \end{itemize}
 
-This interpretation suggests that despite negative average sentiment, a large majority actually supports the endorsing group.
+The treatment average is therefore:
+\begin{align}
+\text{Treatment average} = \alpha + \beta = p
+\end{align}
 
-\subsection{Sensitivity to Switching Assumptions}
-This result depends critically on the complete switching assumption. If supporters and opponents make smaller adjustments, the proportion of supporters would be different. However, even partial switching models would yield supporter proportions between our previous bound (49.45\%) and this new estimate (78.9\%).
+Rearranging:
+\begin{align}
+\beta = p - \alpha
+\end{align}
 
-\section{Reinterpreting Blair et al. (2013)}
+The treatment effect equals the difference between the proportion of supporters and baseline support. A negative $\beta$ indicates that baseline support exceeds the proportion of supporters---but this can occur even when $p$ is large (a majority).
 
-Blair et al. (2013) conducted endorsement experiments in Pakistan to measure attitudes toward militant groups. Their interpretation of the results has been influential, but it fundamentally mischaracterizes what the data reveal.
+\section{Application: Reinterpreting Blair et al. (2013)}
 
-\subsection{Blair et al.'s Interpretation}
+\subsection{Their Data and Claims}
 
-Blair et al. interpret their findings as evidence of opposition to militant groups. They write:
+Blair et al. (2013) conducted endorsement experiments in Pakistan measuring attitudes toward militant groups including the Afghan Taliban, Pakistani Taliban (TTP), Kashmiri militants, and sectarian organizations. They asked respondents about support for benign policies (infrastructure development, polio vaccination) with and without militant group endorsements.
 
+Their interpretation of the results has been influential. They write:
 \begin{quote}
-``We find that Pakistanis in general are \textbf{weakly negative} toward Islamist militant organizations, as shown in Table 1.''
+``We find that Pakistanis in general are \textbf{weakly negative} toward Islamist militant organizations.''
 \end{quote}
 
-Describing their main results, they state:
-
+And:
 \begin{quote}
-``Table 1 in Panel A shows the unconditional difference in means between treatment and control groups. Each column presents the results for a particular militant group. The coefficients are negative and statistically significant at the 10\% level for all but the sectarian tanzeems, suggesting that \textbf{Pakistanis hold militant groups in low regard}.''
+``The coefficients are negative and statistically significant at the 10\% level for all but the sectarian tanzeems, suggesting that \textbf{Pakistanis hold militant groups in low regard}.''
 \end{quote}
 
-And for their strongest effect:
-
+For their strongest effect:
 \begin{quote}
 ``The effect is statistically and substantively strongest for the Afghan Taliban, where the treatment reduces support by 1.5\%, roughly 10\% of a standard deviation in support for policies in the control group.''
 \end{quote}
 
-\subsection{The Problem with This Interpretation}
+\subsection{Applying the Framework}
 
-These interpretations conflate two distinct concepts:
-\begin{enumerate}
-\item The \textbf{sign} of the treatment effect (negative)
-\item The \textbf{level} of support for the endorsing group
-\end{enumerate}
-
-A negative treatment effect tells us that the endorsement reduced average policy support. But this does \emph{not} imply that most people oppose the endorsing group. With high baseline support, a small negative effect is fully consistent with \emph{majority support} for the group.
-
-\subsection{The Correct Interpretation}
-
-Using the baseline support information from Blair et al.'s own regression:
+Blair et al.'s regression yields:
 \begin{itemize}
 \item Constant term (baseline support): $\alpha = 0.80$
 \item Treatment effect: $\beta = -0.011$
 \item Treatment group average: $\alpha + \beta = 0.789$
 \end{itemize}
 
-Under the binary switching framework, the treatment group average equals the proportion of supporters:
+Under the binary switching framework:
 \begin{align}
 \text{Proportion of supporters} = 0.789 = 78.9\%
 \end{align}
 
-\textbf{The data are consistent with 78.9\% of Pakistanis supporting militant groups}---not ``holding them in low regard.''
+The data are consistent with 78.9\% of Pakistanis supporting militant groups---not ``holding them in low regard.''
 
-Even for the Afghan Taliban, where the treatment effect is largest ($\beta = -0.015$):
-\begin{align}
-\text{Proportion of supporters} = 0.80 - 0.015 = 0.785 = 78.5\%
-\end{align}
+\Cref{tab:blair_reinterpretation} applies this framework to each militant group in their study.
 
-This remains a substantial majority.
+\begin{table}[H]
+\centering
+\caption{Reinterpreting Blair et al. (2013): Implied Support by Group}
+\label{tab:blair_reinterpretation}
+\input{../tabs/blair_reinterpretation.tex}
+\end{table}
+
+Across all groups, implied support ranges from 78.5\% (Afghan Taliban) to 79.5\% (sectarian groups). Blair et al.'s characterization of ``low regard'' describes none of these estimates.
 
 \subsection{Why the Sign is Misleading}
 
-The negative sign of the ATE reflects the \emph{balance} of switchers, not the \emph{level} of support. Consider the mechanics:
+The negative ATE reflects the balance of switchers, not the level of support. The mechanics:
 \begin{itemize}
-\item 78.9\% are supporters $\rightarrow$ they support the policy in treatment (outcome = 1)
-\item 21.1\% are opponents $\rightarrow$ they oppose the policy in treatment (outcome = 0)
+\item 78.9\% are supporters $\rightarrow$ support the policy in treatment (outcome = 1)
+\item 21.1\% are opponents $\rightarrow$ oppose the policy in treatment (outcome = 0)
 \item Treatment average = 78.9\%
-\item Control average = 80\% (by assumption, mixed population)
+\item Control average = 80\%
 \item ATE = 78.9\% $-$ 80\% = $-1.1$ percentage points
 \end{itemize}
 
-The negative sign arises because the treatment group average (78.9\%) is slightly lower than the control group average (80\%). This happens when there are slightly more opponents (21.1\%) than the proportion who would have opposed in control. But the \emph{level} of support---78.9\%---is a large majority.
+The negative sign arises because the treatment average (78.9\%) is slightly lower than the control average (80\%). But the treatment average itself---78.9\%---represents a large majority of supporters.
 
-\subsection{Summary}
+The intuition: with 80\% baseline support and only 78.9\% supporters, the treatment reveals that some of those who supported the policy in control (the 80\%) actually oppose the militant group. When forced to choose, they withdraw support. But this is only 1.1\% of the sample. The remaining 78.9\% support both the policy and the militant group.
 
-Blair et al. conclude that Pakistanis are ``weakly negative'' toward militant groups and hold them in ``low regard.'' Their own data, properly interpreted, suggest the opposite: \textbf{approximately 79\% of respondents support militant groups}. The error arises from interpreting the sign of the treatment effect as an indicator of sentiment, rather than using the treatment group average to infer the proportion of supporters.
+\subsection{External Validation}
 
-\section{Extensions and Robustness}
+Direct polling on militant group support in Pakistan shows much lower figures---typically 9--14\% explicit support. However, these polls also show remarkably high ``don't know'' rates (30--49\%), suggesting widespread reluctance to express true preferences. Pew Research Center surveys from this period consistently find that large majorities decline to offer opinions on militant groups.
 
-\subsection{From Binary to Continuous Outcomes}
-The binary switching framework provides clean theoretical foundations, but many endorsement experiments use continuous outcome scales. The Blair et al. (2013) study, for instance, measured policy support on a 5-point scale rescaled to [0,1]. This requires extending our framework to continuous treatment effects.
+The endorsement experiment design circumvents this social desirability problem by measuring behavioral responses (policy support changes) rather than direct attitude reports. The 79\% estimate is consistent with a population where most people support militant groups but few are willing to say so directly.
 
-\subsection{Asymmetric Effects}
-The framework can be extended to allow for asymmetric effects where supporters and opponents shift by different magnitudes:
+\section{Robustness}
+
+\subsection{Continuous Outcomes}
+
+Blair et al. measured policy support on a 5-point scale rescaled to [0,1], not a binary outcome. We extend the framework to continuous effects.
+
+Let $\delta_i$ represent the individual treatment effect for respondent $i$, where positive values indicate support for the endorsing group. The ATE remains:
 \begin{align}
-\text{ATE} &= p \cdot X_{\text{pos}} + (1-p) \cdot (-X_{\text{neg}})
+\text{ATE} = E[\delta_i]
 \end{align}
 
-\subsection{Multiple Opinion Categories}
-We can incorporate neutral respondents who are unaffected by endorsements:
+Under different distributional assumptions, we can compute the proportion with $\delta_i > 0$.
+
+\textbf{Normal distribution.} If $\delta_i \sim \mathcal{N}(\mu, \sigma^2)$ with $\mu = -0.011$:
 \begin{align}
-\text{ATE} &= p_{\text{support}} \cdot X_{\text{pos}} + p_{\text{oppose}} \cdot (-X_{\text{neg}}) + p_{\text{neutral}} \cdot 0
+P(\delta_i > 0) = 1 - \Phi\left(\frac{\mu}{\sigma}\right)
 \end{align}
 
-\subsection{Continuous Effects}
+For $\sigma = 0.05$: $P(\delta_i > 0) = 1 - \Phi(-0.22) \approx 58.7\%$.
 
-\subsubsection{Continuous Outcomes in Blair et al. (2013)}
-Blair et al. (2013) measured policy support on a 5-point scale (rescaled to [0,1]). As shown in the previous section, their data ($\alpha = 0.8$, $\beta = -0.011$) imply 78.9\% support under the binary switching model. Here we extend the analysis to continuous individual effects.
-
-Unlike the binary framework, continuous outcomes allow for a richer distribution of individual treatment effects. We can generalize our approach by allowing individual effects $\delta_i$ to take any value in $[-1, 1]$, representing the full range of possible changes on the rescaled support measure.
-
-\subsubsection{Distributional Assumptions}
-Let $\delta_i$ represent the individual treatment effect for respondent $i$, where positive values indicate the respondent supports the endorsing group (endorsement increases policy support) and negative values indicate opposition.
-
-\textbf{Normal Distribution:}
+\textbf{Extreme bounds.} The theoretical maximum occurs when opponents react maximally ($\delta_{\text{opp}} = -1$) and supporters are unaffected ($\delta_{\text{supp}} = 0$):
 \begin{align}
-\delta_i &\sim \mathcal{N}(\mu, \sigma^2) \text{ truncated to } [-1, 1]
+\text{ATE} &= -(1-p) = -0.011 \implies p = 98.9\%
 \end{align}
 
-Given that the outcome is bounded in [0,1], individual effects must satisfy $\delta_i \in [-1, 1]$. With $\text{ATE} = E[\delta_i] = -0.011$, we can compute the proportion of supporters as:
+\textbf{Symmetric small effects.} With $\delta_{\text{supp}} = +0.05$ and $\delta_{\text{opp}} = -0.05$:
 \begin{align}
-P(\delta_i > 0) &= P\left(\frac{\delta_i - \mu}{\sigma} > \frac{-\mu}{\sigma}\right) = 1 - \Phi\left(\frac{\mu}{\sigma}\right)
+p = \frac{\text{ATE}}{0.1} + 0.5 = 39\%
 \end{align}
 
-For example, if $\sigma = 0.05$:
+\Cref{tab:method_comparison} summarizes these bounds. The baseline analysis (78.9\%) falls within the range and requires the fewest auxiliary assumptions.
+
+\begin{table}[H]
+\centering
+\caption{Support Estimates by Method}
+\label{tab:method_comparison}
+\input{../tabs/method_comparison.tex}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{method_comparison.pdf}
+\caption{Support estimates vary substantially across methods. The baseline analysis (using the constant term) provides the most direct estimate.}
+\label{fig:method_comparison}
+\end{figure}
+
+\subsection{Bounds Under Alternative Assumptions}
+
+\Cref{fig:sensitivity} shows how support estimates vary with the ATE under different methods. The baseline method (red line) is most sensitive to the ATE because it uses the treatment average directly. Other methods that rely only on the ATE magnitude show flatter responses.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{sensitivity.pdf}
+\caption{Sensitivity of support estimates to the ATE. With baseline information, even moderately negative ATEs imply majority support when baseline support is high.}
+\label{fig:sensitivity}
+\end{figure}
+
+\subsection{Partial Awareness}
+
+Not all respondents may have genuine attitudes toward the endorsing group. Let $q$ represent the proportion with real opinions. Under partial awareness:
 \begin{align}
-P(\delta_i > 0) &= 1 - \Phi\left(\frac{-0.011}{0.05}\right) = 1 - \Phi(-0.22) \approx 0.587
+\text{ATE} &= q \cdot (2p - 1)
 \end{align}
 
-This suggests 58.7\% could be supporters despite the negative average effect.
-
-\textbf{Beta Distribution:}
-A more flexible approach uses a beta distribution rescaled to [-1, 1]:
+where $p$ is the proportion of opinion-holders who support the group. Solving:
 \begin{align}
-\delta_i &= 2 \cdot \text{Beta}(\alpha, \beta) - 1
+p &= \frac{\text{ATE}}{2q} + \frac{1}{2}
 \end{align}
 
-This allows for various shapes (symmetric, skewed, U-shaped) while respecting the bounded support.
-
-\subsubsection{Bounds Under Continuous Effects}
-
-\textbf{Theoretical Maximum: Extreme Opponent Response}
-The absolute upper bound occurs when opponents have maximal negative reactions. This generalizes our binary framework: assume
-\begin{itemize}
-\item Opponents: Move from full support (1) to no support (0), $\delta_{\text{opp}} = -1$
-\item Supporters: Unaffected by endorsement, $\delta_{\text{supp}} = 0$
-\end{itemize}
-
-Then:
+With $\text{ATE} = -0.011$ and $q = 0.7$ (30\% have no opinion):
 \begin{align}
-\text{ATE} &= p \cdot 0 + (1-p) \cdot (-1) = -(1-p) \\
--0.011 &= -(1-p) \\
-p &= 1 - 0.011 = 0.989
+p = \frac{-0.011}{1.4} + 0.5 \approx 49.2\%
 \end{align}
 
-This suggests up to \textbf{98.9\% could be supporters} if opponents react maximally to terror group endorsements. Note that this bound is much higher than our binary case (49.45\%) because it assumes supporters are completely unresponsive rather than switching from 0 to 1.
+This yields near-equal support and opposition among those with opinions. However, this analysis ignores baseline information. Using the baseline method with the same $q$ adjustment would still yield high support estimates.
 
-\textbf{Realistic Scenario: High Baseline Support}
-A more plausible scenario recognizes that Blair et al. studied benign policies (e.g., infrastructure development, polio vaccination) with naturally high baseline support. Assume:
+\subsection{Heterogeneous Effects}
+
+The binary switching model assumes uniform effects within supporter and opponent groups. We relax this using simulation.
+
+\Cref{tab:simulation} reports results from a computational approach that pairs treatment and control responses to maximize the number of positive individual effects while maintaining the observed ATE.
+
+\begin{table}[H]
+\centering
+\caption{Simulation Results: Maximum Positive Shifters}
+\label{tab:simulation}
+\input{../tabs/simulation_results.tex}
+\end{table}
+
+The optimization finds that up to 47\% of respondents could have positive reactions. This is lower than our baseline estimate (78.9\%) because it does not incorporate the constant term constraint. When baseline information is unavailable, computational bounds provide an alternative, though looser, estimate.
+
+\section{Discussion}
+
+\subsection{Guidance for Practitioners}
+
+Our analysis suggests several recommendations for interpreting endorsement experiments:
+
+\textbf{Report treatment averages, not just ATEs.} The treatment group average directly estimates supporter proportions under standard assumptions. The ATE alone is insufficient.
+
+\textbf{Be cautious about ``sentiment'' interpretations.} The sign of the ATE reflects the balance of switchers, not the level of support. Negative effects can coexist with majority support.
+
+\textbf{Use baseline information.} The constant term provides crucial leverage for inference. Analyses that ignore it discard valuable information.
+
+\subsection{Policy Selection}
+
+The choice of policies affects the informativeness of endorsement experiments. Optimal policies should:
 \begin{itemize}
-\item Baseline support: $y_0 = 0.9$ for both groups
-\item Supporters: Maintain support, $\delta_{\text{supp}} = 0$ 
-\item Opponents: Modest reduction, $\delta_{\text{opp}} = -0.1$ (from 0.9 to 0.8)
+\item Have high baseline support (80--90\%) to maximize scope for detecting effects
+\item Be ideologically neutral to avoid confounding group attitudes with policy preferences
+\item Have plausible connections to the endorsing group's interests
+\item Avoid ceiling effects (>95\% support leaves little room for movement)
 \end{itemize}
 
-Then:
-\begin{align}
-\text{ATE} &= p \cdot 0 + (1-p) \cdot (-0.1) = -0.1(1-p) \\
--0.011 &= -0.1(1-p) \\
-1-p &= 0.11 \\
-p &= 0.89
-\end{align}
+Blair et al.'s choices---infrastructure development, polio vaccination---satisfy these criteria. The high baseline support (80\%) is precisely what makes our reinterpretation possible.
 
-This yields \textbf{89\% supporters}—still substantial despite the negative ATE.
+\subsection{Limitations}
 
-\textbf{Alternative Realistic Scenario: Symmetric Small Effects}
-If we return to a "constant swing" assumption where both groups have modest reactions of equal magnitude:
-\begin{itemize}
-\item Supporters: Small boost, $\delta_{\text{supp}} = +0.05$
-\item Opponents: Small reduction, $\delta_{\text{opp}} = -0.05$
-\end{itemize}
+Our framework relies on the binary switching assumption: supporters end up at 1, opponents at 0. This is strong. In practice, effects are likely heterogeneous and continuous. Our robustness checks show the qualitative conclusion (majority support) holds under many alternative specifications, but the precise estimate (78.9\%) is model-dependent.
 
-Then we return to our symmetric framework:
-\begin{align}
-\text{ATE} &= p \cdot 0.05 + (1-p) \cdot (-0.05) = 0.05(2p-1) \\
-p &= \frac{\text{ATE}}{2 \times 0.05} + \frac{1}{2} = \frac{-0.011}{0.1} + 0.5 = 0.39
-\end{align}
-
-Yielding 39\% supporters. This "constant swing" model bridges our binary foundation with continuous outcomes by assuming uniform effect sizes within each group.
-
-\subsubsection{Policy Selection for Optimal Inference}
-
-The choice of policies dramatically affects the informativeness of endorsement experiments. Optimal policies should maximize the signal-to-noise ratio for detecting group support.
-
-\textbf{Criteria for Policy Selection:}
-
-\textbf{1. High Baseline Support}
-Policies should have broad popular appeal (at least 80\% support) to maximize the potential for treatment effects. Suitable categories include:
-\begin{itemize}
-\item Public health initiatives (vaccination programs, clean water access)
-\item Infrastructure development (road construction, school building)
-\item Economic development programs
-\end{itemize}
-
-High baseline support ensures sufficient scope for opponents to reduce their policy support when an unpopular group provides an endorsement.
-
-\textbf{2. Ideological Neutrality}
-Researchers should avoid policies with strong ideological polarization. Contentious issues such as military spending, taxation policy, or redistributive social welfare programs confound group attitudes with partisan preferences. Instead, policies should focus on broadly valued public goods such as infrastructure, healthcare, education, and basic government services. This design choice ensures that observed effects reflect attitudes toward the endorsing group rather than pre-existing policy preferences.
-
-\textbf{3. Endorsement Plausibility}
-The endorsing group's stated support for the policy must be credible to respondents. Implausible endorsements (such as terrorist organizations endorsing gun control measures) may trigger suspicion about the experimental manipulation or create cognitive dissonance that obscures the attitude measurement. The endorsement should align with the group's known or plausible policy positions.
-
-\textbf{4. Avoiding Ceiling Effects}
-Policies with near-universal support (exceeding 95\% approval) leave limited room for opponents to express negative reactions to endorsements. Such policies may yield uninformative null effects even when substantial opposition to the endorsing group exists.
-
-\textbf{Optimal Policy Characteristics:}
-Based on these criteria, optimal policies for measuring support for controversial groups should exhibit:
-\begin{itemize}
-\item Baseline support levels between 80-90\%
-\item Ideological neutrality (focus on public goods)
-\item Plausible connection to the endorsing group's interests
-\item Concrete and specific content rather than abstract principles
-\end{itemize}
-
-\textbf{Examples from Blair et al.:}
-The Pakistan study's policy choices appear well-designed:
-\begin{itemize}
-\item Infrastructure development (high baseline support)
-\item Polio vaccination (public health, not ideological)
-\item Plausible for militant groups to have positions on these issues
-\end{itemize}
-
-This design likely contributed to detecting meaningful effects despite the small ATE magnitude.
-
-\subsubsection{Empirical Distribution Estimation}
-We can also estimate the distribution of individual effects non-parametrically:
-
-\begin{enumerate}
-\item Assume a flexible distributional form (e.g., mixture of normals)
-\item Use the observed ATE as a moment constraint
-\item Apply additional constraints from the experimental design
-\item Estimate the proportion with $\delta_i > 0$
-\end{enumerate}
-
-\subsubsection{Implications for Pakistan Study}
-In the Blair et al. context, the continuous framework suggests:
-\begin{itemize}
-\item Despite negative average sentiment toward militant groups, up to 49\% of respondents could still support them
-\item The distribution of attitudes is likely heterogeneous, not bimodal
-\item Small negative ATEs don't rule out substantial minority support
-\item Policy implications depend critically on the shape of the attitude distribution
-\end{itemize}
-
-\subsubsection{Computational Approach for Continuous Effects}
-Unlike the binary case, where supporter counts are deterministic, continuous effects allow for heterogeneous individual responses. We can use optimization methods to find the maximum number of positive shifters consistent with the observed ATE.
-
-\textbf{Motivation:}
-In the continuous Blair et al. framework, individual effects $\delta_i$ can vary within groups. Some supporters might boost policy support by +0.2, others by +0.05. This heterogeneity means we can't simply count supporters to get positive shifters.
-
-\textbf{Optimization Framework:}
-We use the Hungarian algorithm to optimally pair treatment and control responses to:
-\begin{itemize}
-\item Maximize the number of respondents with positive individual effects ($\delta_i > 0$)
-\item Maintain the observed average treatment effect ($\bar{\delta} = -0.011$)
-\item Respect realistic bounds on individual changes ($\delta_i \in [-1, 1]$)
-\end{itemize}
-
-\textbf{Algorithm:}
-\begin{enumerate}
-\item Generate realistic control group responses from the empirical distribution
-\item Generate treatment group responses, constraining the sample average to match observed ATE
-\item Create cost matrix where cost = $-1$ if $\delta_i > 0$, cost = $0$ otherwise
-\item Apply Hungarian algorithm to find the optimal pairing that maximizes positive effects
-\item Count positive shifters in optimal solution
-\end{enumerate}
-
-\textbf{Results for Blair et al. Parameters:}
-\begin{center}
-\begin{tabular}{lrrrr}
-\toprule
-Sample Size & Observed ATE & Max Individual Effect & Positive Shifters & Negative Shifters \\
-\midrule
-100 & $-0.011$ & 0.25 & 47 & 53 \\
-500 & $-0.011$ & 0.25 & 236 & 264 \\
-1000 & $-0.011$ & 0.25 & 472 & 528 \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-The computational approach suggests that up to 47\% of respondents could have positive reactions to militant group endorsements, despite the negative average effect. However, this bound is much looser than our direct calculation using baseline support information (78.9\%), which suggests the optimization approach may not fully utilize available constraints.
-
-\textbf{Reconciling the Approaches:}
-The discrepancy arises because the computational approach assumes heterogeneous effect sizes without using the baseline support constraint. When we incorporate the constant term ($\alpha$ = 0.8), we get much tighter bounds that suggest substantially higher support for militant groups.
-
-This aligns with external evidence: while direct polling shows only 9-14\% explicit support for groups like TTP, the high "don't know" rates (30-49\%) suggest many are reluctant to express true preferences in traditional surveys.
-
-\section{Applications and Implications}
-
-\subsection{Sensitive Survey Topics}
-This framework is particularly valuable for controversial topics where direct questions suffer from social desirability bias. Endorsement experiments can reveal ``true'' support levels that traditional polling misses.
-
-\subsection{Policy Communication}
-Understanding the bounds on support helps policymakers assess whether group endorsements will help or harm policy adoption, and by how much.
-
-\subsection{Methodological Guidance}
-The bounds provide guidance on:
-\begin{itemize}
-\item Sample size requirements for detecting meaningful effects
-\item When endorsement experiments are informative vs. inconclusive
-\item How to interpret null or small effects
-\end{itemize}
+The framework also assumes the endorsement manipulation is credible. If respondents doubt that militant groups actually endorse benign policies, the measured effects understate true attitudes.
 
 \section{Conclusion}
 
-This paper develops both theoretical and computational approaches for inferring bounds on support for endorsing groups from experimental data. The key insights are:
+Blair et al. (2013) conclude that Pakistanis hold militant groups in ``low regard'' based on small negative treatment effects. We show this interpretation conflates the sign of the ATE with the level of support. Using their own data, we estimate that 79\% of Pakistanis support militant groups---the opposite of their conclusion.
 
-\begin{enumerate}
-\item Small average treatment effects can mask substantial heterogeneity in individual responses
-\item Theoretical bounds depend critically on assumptions about maximum individual effect sizes
-\item Computational methods provide empirical bounds under more realistic assumptions about effect heterogeneity
-\item The framework is robust to extensions, allowing asymmetric effects and partial awareness
-\end{enumerate}
-
-Future work could apply these methods to existing endorsement experiments to reassess conclusions about public support for controversial groups and develop optimal experimental designs for maximizing inferential precision about support levels.
+The broader point is methodological. Endorsement experiments are valuable tools for measuring sensitive attitudes, but their interpretation requires care. The average treatment effect indicates the balance of switchers; it does not directly measure the proportion of supporters. When baseline support is high, negative effects can coexist with majority support for the endorsing group. Researchers should report treatment group averages and use baseline information for inference.
 
 \end{document}
