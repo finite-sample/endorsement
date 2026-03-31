@@ -4,6 +4,20 @@
 
 * [Manuscript (pdf and .tex)](ms/)
 
+## The Problem: Misinterpreting Endorsement Experiments
+
+Blair et al. (2013) conducted influential endorsement experiments in Pakistan and concluded:
+
+> "We find that Pakistanis in general are **weakly negative** toward Islamist militant organizations."
+
+> "The coefficients are negative and statistically significant...suggesting that **Pakistanis hold militant groups in low regard**."
+
+**These interpretations are wrong.**
+
+With 80% baseline policy support and a -0.011 treatment effect, the data actually imply **78.9% of Pakistanis support militant groups**. The negative sign of the coefficient reflects the balance of switchers, not the level of support.
+
+See the [detailed reinterpretation notebook](scripts/blair_reinterpretation.ipynb) and [manuscript](ms/endorsement.pdf) for the full analysis.
+
 ## Overview
 
 Endorsement experiments measure how group endorsements affect policy support, but interpreting the results to infer actual support for the endorsing group is complex. This toolkit provides:
@@ -52,11 +66,13 @@ print(f"Binary framework max: {binary_results['p_max']:.1%}")
 ## File Structure
 
 ```
+├── ms/endorsement.tex                          # Manuscript with full theoretical framework
+├── scripts/blair_reinterpretation.ipynb        # Blair et al. critique notebook
 ├── scripts/endorsement_analysis_notebook.py    # Main analysis classes and functions
-├── scripts/endorsement_utils.py                # Utility functions and calculations  
+├── scripts/endorsement_utils.py                # Utility functions and calculations
 ├── scripts/endorsement_viz.py                  # Visualization tools
 ├── scripts/endorsement_quick_analysis.py       # Quick analysis script
-└── README.md                          # This file
+└── README.md                                   # This file
 ```
 
 ## Key Methods
@@ -92,20 +108,31 @@ score = analyzer.policy_selection_score(
 )
 ```
 
-## Real-World Example: Blair et al. (2013)
+## Reinterpreting Blair et al. (2013)
 
 **Study:** Pakistani attitudes toward militant groups via policy endorsements
-**Results:** ATE = -0.011, Baseline = 0.8
 
-**Traditional interpretation:** "Negative sentiment toward militant groups"
-**Our analysis:** "78.9% actually support militant groups despite negative ATE"
+**Their data:**
+- Baseline policy support (constant): 0.80
+- Treatment effect (ATE): -0.011
+- Strongest effect (Afghan Taliban): -0.015
+
+**Blair et al.'s interpretation:**
+> "Pakistanis hold militant groups in low regard"
+
+**Correct interpretation:**
+- Treatment group average = 0.80 - 0.011 = **78.9%**
+- Under binary switching, this equals the proportion of supporters
+- **78.9% of Pakistanis support militant groups**
+
+Even for the Afghan Taliban (strongest effect): 0.80 - 0.015 = **78.5% support**
 
 ```python
-# Replicate Blair et al. analysis
-results = blair_replication()
+from endorsement_analysis_notebook import EndorsementAnalyzer
 
-# Key insight: Small negative ATE + high baseline = majority support
-# This happens when popular policies get endorsed by controversial groups
+analyzer = EndorsementAnalyzer(ate=-0.011, constant_term=0.8)
+result = analyzer.baseline_support_analysis()
+print(f"Proportion supporters: {result['proportion_supporters']:.1%}")  # 78.9%
 ```
 
 ## Understanding the Results

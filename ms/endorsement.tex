@@ -242,7 +242,79 @@ This interpretation suggests that despite negative average sentiment, a large ma
 \subsection{Sensitivity to Switching Assumptions}
 This result depends critically on the complete switching assumption. If supporters and opponents make smaller adjustments, the proportion of supporters would be different. However, even partial switching models would yield supporter proportions between our previous bound (49.45\%) and this new estimate (78.9\%).
 
+\section{Reinterpreting Blair et al. (2013)}
 
+Blair et al. (2013) conducted endorsement experiments in Pakistan to measure attitudes toward militant groups. Their interpretation of the results has been influential, but it fundamentally mischaracterizes what the data reveal.
+
+\subsection{Blair et al.'s Interpretation}
+
+Blair et al. interpret their findings as evidence of opposition to militant groups. They write:
+
+\begin{quote}
+``We find that Pakistanis in general are \textbf{weakly negative} toward Islamist militant organizations, as shown in Table 1.''
+\end{quote}
+
+Describing their main results, they state:
+
+\begin{quote}
+``Table 1 in Panel A shows the unconditional difference in means between treatment and control groups. Each column presents the results for a particular militant group. The coefficients are negative and statistically significant at the 10\% level for all but the sectarian tanzeems, suggesting that \textbf{Pakistanis hold militant groups in low regard}.''
+\end{quote}
+
+And for their strongest effect:
+
+\begin{quote}
+``The effect is statistically and substantively strongest for the Afghan Taliban, where the treatment reduces support by 1.5\%, roughly 10\% of a standard deviation in support for policies in the control group.''
+\end{quote}
+
+\subsection{The Problem with This Interpretation}
+
+These interpretations conflate two distinct concepts:
+\begin{enumerate}
+\item The \textbf{sign} of the treatment effect (negative)
+\item The \textbf{level} of support for the endorsing group
+\end{enumerate}
+
+A negative treatment effect tells us that the endorsement reduced average policy support. But this does \emph{not} imply that most people oppose the endorsing group. With high baseline support, a small negative effect is fully consistent with \emph{majority support} for the group.
+
+\subsection{The Correct Interpretation}
+
+Using the baseline support information from Blair et al.'s own regression:
+\begin{itemize}
+\item Constant term (baseline support): $\alpha = 0.80$
+\item Treatment effect: $\beta = -0.011$
+\item Treatment group average: $\alpha + \beta = 0.789$
+\end{itemize}
+
+Under the binary switching framework, the treatment group average equals the proportion of supporters:
+\begin{align}
+\text{Proportion of supporters} = 0.789 = 78.9\%
+\end{align}
+
+\textbf{The data are consistent with 78.9\% of Pakistanis supporting militant groups}---not ``holding them in low regard.''
+
+Even for the Afghan Taliban, where the treatment effect is largest ($\beta = -0.015$):
+\begin{align}
+\text{Proportion of supporters} = 0.80 - 0.015 = 0.785 = 78.5\%
+\end{align}
+
+This remains a substantial majority.
+
+\subsection{Why the Sign is Misleading}
+
+The negative sign of the ATE reflects the \emph{balance} of switchers, not the \emph{level} of support. Consider the mechanics:
+\begin{itemize}
+\item 78.9\% are supporters $\rightarrow$ they support the policy in treatment (outcome = 1)
+\item 21.1\% are opponents $\rightarrow$ they oppose the policy in treatment (outcome = 0)
+\item Treatment average = 78.9\%
+\item Control average = 80\% (by assumption, mixed population)
+\item ATE = 78.9\% $-$ 80\% = $-1.1$ percentage points
+\end{itemize}
+
+The negative sign arises because the treatment group average (78.9\%) is slightly lower than the control group average (80\%). This happens when there are slightly more opponents (21.1\%) than the proportion who would have opposed in control. But the \emph{level} of support---78.9\%---is a large majority.
+
+\subsection{Summary}
+
+Blair et al. conclude that Pakistanis are ``weakly negative'' toward militant groups and hold them in ``low regard.'' Their own data, properly interpreted, suggest the opposite: \textbf{approximately 79\% of respondents support militant groups}. The error arises from interpreting the sign of the treatment effect as an indicator of sentiment, rather than using the treatment group average to infer the proportion of supporters.
 
 \section{Extensions and Robustness}
 
@@ -263,21 +335,8 @@ We can incorporate neutral respondents who are unaffected by endorsements:
 
 \subsection{Continuous Effects}
 
-\subsubsection{Empirical Example: Blair et al. (2013)}
-Blair et al. (2013) conducted an endorsement experiment in Pakistan where respondents rated support for four policies on a 5-point scale (rescaled to [0,1]). The results showed:
-\begin{itemize}
-\item Constant term: $\alpha \approx 0.8$ (baseline policy support)
-\item Treatment effect: $\beta = -0.011$ (endorsement effect)
-\end{itemize}
-
-\textbf{Direct Calculation Using Baseline Information:}
-If we apply our complete binary switching model:
-\begin{align}
-\text{Treatment group average} &= \alpha + \beta = 0.8 - 0.011 = 0.789 \\
-\text{Proportion of supporters} &= 0.789 = 78.9\%
-\end{align}
-
-This suggests that **78.9\% of respondents support the militant groups** under the complete switching assumption - a dramatically different conclusion than focusing solely on the negative treatment effect.
+\subsubsection{Continuous Outcomes in Blair et al. (2013)}
+Blair et al. (2013) measured policy support on a 5-point scale (rescaled to [0,1]). As shown in the previous section, their data ($\alpha = 0.8$, $\beta = -0.011$) imply 78.9\% support under the binary switching model. Here we extend the analysis to continuous individual effects.
 
 Unlike the binary framework, continuous outcomes allow for a richer distribution of individual treatment effects. We can generalize our approach by allowing individual effects $\delta_i$ to take any value in $[-1, 1]$, representing the full range of possible changes on the rescaled support measure.
 

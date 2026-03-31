@@ -193,3 +193,5 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 .DS_Store
+ms/endorsement.aux
+ms/endorsement.out
