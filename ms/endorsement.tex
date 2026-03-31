@@ -84,18 +84,18 @@
 \maketitle
 
 \begin{abstract}
-\noindent Endorsement experiments measure how group endorsements affect policy support, and researchers routinely interpret the sign of the average treatment effect as indicating ``sentiment'' toward the endorsing group. I show that this interpretation is wrong when applied to levels of support: the ATE reflects the balance of switchers, not the proportion of supporters. Using both the treatment effect and the baseline support level, I derive bounds on the proportion of supporters under a family of behavioral models. Applied to \citet{blair2013poverty}, where baseline policy support is 80\% and the treatment effect is $-1.1$ percentage points, the estimates range from 39\% to 99\% depending on assumptions about individual-level switching behavior, with the binary switching model yielding 79\%. No model considered here supports their characterization of ``low regard'' for militant groups. The precise level of support depends on assumptions the data cannot adjudicate, but the broader point is that endorsement experiments are underidentified for the quantity researchers most want to estimate---the proportion of supporters---without strong auxiliary assumptions about individual behavior.
+\noindent Endorsement experiments measure how group endorsements affect policy support, and researchers routinely interpret the sign of the average treatment effect as indicating ``sentiment'' toward the endorsing group. I show that this interpretation is wrong when applied to levels of support: the ATE reflects the balance of switchers, not the proportion of supporters. Using both the treatment effect and the baseline support level, I derive bounds on the proportion of supporters under a family of behavioral models. I reanalyze data from \citet{blair2013poverty}, where baseline policy support ranges from 67\% to 83\% across policies (overall 74\%) and the treatment effect is $-1.3$ percentage points. The estimates range from 37\% to 99\% depending on assumptions about individual-level switching behavior, with the binary switching model yielding 72\%. However, variance tests on the actual data strongly reject the binary switching assumption: observed treatment variance is only 42\% of the predicted variance under binary switching. No model considered here supports their characterization of ``low regard'' for militant groups. The precise level of support depends on assumptions the data cannot adjudicate, but the broader point is that endorsement experiments are underidentified for the quantity researchers most want to estimate---the proportion of supporters---without strong auxiliary assumptions about individual behavior.
 \end{abstract}
 
 \section{Introduction}
 
 \citet{blair2013poverty} conclude that Pakistanis hold militant groups in ``low regard'' based on small negative treatment effects from endorsement experiments. This inference---from the sign of the ATE to the level of support---is wrong. The sign of the average treatment effect (ATE) tells us the balance of switchers, not the level of support for the endorsing group. With high baseline policy support, a small negative effect is consistent with a wide range of supporter proportions, including large majorities.
 
-The problem is general. Endorsement experiments identify the ATE under standard exclusion restrictions, but the ATE alone does not identify the proportion of supporters. Mapping from the ATE to a supporter proportion requires auxiliary assumptions about individual switching behavior. Under binary switching (every supporter moves to 1, every opponent moves to 0), the treatment group average equals the supporter proportion exactly. Under symmetric small effects ($\pm 0.05$), the same ATE implies only 39\% support. The data cannot distinguish these models.
+The problem is general. Endorsement experiments identify the ATE under standard exclusion restrictions, but the ATE alone does not identify the proportion of supporters. Mapping from the ATE to a supporter proportion requires auxiliary assumptions about individual switching behavior. Under binary switching (every supporter moves to 1, every opponent moves to 0), the treatment group average equals the supporter proportion exactly. Under symmetric small effects ($\pm 0.05$), the same ATE implies only 37\% support. The data cannot distinguish these models.
 
 This paper develops a framework for what endorsement experiments can and cannot tell us about support levels. The framework uses both the treatment effect and the baseline support level (the regression constant), and yields bounds under different assumptions about individual behavior. The key insight is simple: baseline support information is crucial and routinely ignored, and the range of estimates compatible with a given ATE is wide enough that ``sentiment'' interpretations based on the sign alone are unreliable.
 
-Applied to \citet{blair2013poverty}, where baseline support is 80\% and the treatment effect is $-1.1$ percentage points, the framework yields estimates ranging from 39\% (symmetric effects) to 99\% (extreme opponent reaction), with the binary switching model at 79\%. None of these estimates support their characterization of ``low regard.'' But the 79\% figure requires a strong behavioral assumption that is testable and likely violated in their data.
+Reanalyzing the original data from \citet{blair2013poverty}, where baseline support averages 74\% and the treatment effect is $-1.3$ percentage points, the framework yields estimates ranging from 37\% (symmetric effects) to 99\% (extreme opponent reaction), with the binary switching model at 72\%. None of these estimates support their characterization of ``low regard.'' Crucially, the binary switching assumption is testable---and the data reject it: observed treatment variance is only 42\% of what binary switching predicts.
 
 This paper proceeds as follows. \Cref{sec:background} reviews endorsement experiments and the interpretation problem. \Cref{sec:framework} develops the inferential framework and states explicitly what is and is not identified. \Cref{sec:application} applies it to \citeauthor{blair2013poverty}. \Cref{sec:robustness} examines robustness. \Cref{sec:discussion} discusses implications. \Cref{sec:conclusion} concludes.
 
@@ -156,11 +156,13 @@ The treatment group average equals the proportion of supporters. This result is 
 
 \subsection{Testable Implications of Binary Switching}
 
-Binary switching has a strong testable implication. If all treatment group responses are either 0 or 1, the treatment group variance must equal $p(1-p)$. With $p = 0.789$, the predicted treatment variance is $0.789 \times 0.211 \approx 0.166$, and the standard deviation is approximately 0.41.
+Binary switching has a strong testable implication. If all treatment group responses are either 0 or 1, the treatment group variance must equal $p(1-p)$. With $p = 0.72$ (the binary switching estimate from the actual data), the predicted treatment variance is $0.72 \times 0.28 \approx 0.20$.
 
-\citet{blair2013poverty} measured policy support on a 5-point scale rescaled to $[0,1]$. If the treatment group standard deviation is substantially below 0.41, the binary switching model is rejected. For reference, the control group standard deviation implied by their results is approximately 0.15 (roughly 10\% of a standard deviation corresponds to a 1.5 percentage point effect for the Afghan Taliban). A treatment standard deviation of similar magnitude would be inconsistent with binary switching by a factor of nearly three, indicating that respondents are not clustering at the extremes of the scale.
+\citet{blair2013poverty} measured policy support on a 5-point scale rescaled to $[0,1]$. The binary switching model predicts responses should cluster at 0 and 1. If the treatment group variance is substantially below $p(1-p)$, the binary switching model is rejected.
 
-This does not invalidate the framework. It means the precise mapping $p = \alpha + \beta$ does not hold, and the analyst must consider softer switching models.
+Reanalyzing the original data, I find the observed average treatment variance is 0.082, compared to a predicted variance of 0.197 under binary switching. The ratio of observed to predicted variance is 0.42---respondents are not clustering at the extremes of the scale. This pattern holds across all 16 policy $\times$ endorser pairs, with ratios ranging from 0.35 to 0.47 (\cref{tab:variance_test}).
+
+This does not invalidate the framework. It means the precise mapping $p = \alpha + \beta$ does not hold as a descriptive matter, and the analyst must consider softer switching models. The binary switching estimate should be understood as an upper bound conditional on a model that the data reject.
 
 \subsection{Softer Switching Models}
 
@@ -171,23 +173,23 @@ Without binary switching, the analyst faces the decomposition in \cref{eq:ate_de
 p = \frac{\beta}{2d} + \frac{1}{2}
 \end{align}
 
-With $d = 0.05$ (a moderate shift on a $[0,1]$ scale): $p = -0.011/0.1 + 0.5 = 0.39$, or 39\%.
+With $d = 0.05$ (a moderate shift on a $[0,1]$ scale) and $\beta = -0.013$: $p = -0.013/0.1 + 0.5 = 0.37$, or 37\%.
 
 \textbf{Asymmetric extreme reaction.} If opponents react maximally ($\delta^- = -1$, moving to 0) while supporters are unaffected ($\delta^+ = 0$):
 \begin{align}
 \beta = -(1-p) \implies p = 1 + \beta
 \end{align}
 
-With $\beta = -0.011$: $p = 0.989$, or 99\%.
+With $\beta = -0.013$: $p = 0.987$, or 99\%.
 
 \textbf{Normal heterogeneity.} If individual effects $\delta_i \sim \mathcal{N}(\beta, \sigma^2)$, the proportion with positive effects (loosely, ``supporters'' in a continuous sense) is:
 \begin{align}
 P(\delta_i > 0) = 1 - \Phi\left(\frac{-\beta}{\sigma}\right)
 \end{align}
 
-With $\beta = -0.011$ and $\sigma = 0.05$: $P(\delta_i > 0) \approx 41\%$.
+With $\beta = -0.013$ and $\sigma = 0.05$: $P(\delta_i > 0) \approx 40\%$.
 
-\Cref{tab:method_comparison} collects these estimates. The range is wide: from 39\% to 99\%. Baseline information narrows the range somewhat but cannot resolve the fundamental underidentification.
+\Cref{tab:method_comparison} collects these estimates. The range is wide: from 37\% to 99\%. Baseline information narrows the range somewhat but cannot resolve the fundamental underidentification.
 
 \begin{table}[H]
 \centering
@@ -209,7 +211,7 @@ The contribution of baseline information is the most practically important findi
 
 \subsection{Their Data and Claims}
 
-\citet{blair2013poverty} conducted endorsement experiments in Pakistan measuring attitudes toward the Afghan Taliban, Pakistani Taliban (TTP), Kashmiri militants, and sectarian organizations. Respondents were asked about support for benign policies (infrastructure development, polio vaccination) with and without militant group endorsements. The sample comprised approximately 6,000 respondents in a nationally representative survey.
+\citet{blair2013poverty} conducted endorsement experiments in Pakistan measuring attitudes toward the Afghan Taliban, al-Qaeda, Kashmiri militants, and sectarian organizations. Respondents were asked about support for four policies (polio vaccination, FCR reform, Durand Line, curriculum standardization) with and without militant group endorsements. The sample comprised approximately 5,200 respondents in a nationally representative survey. I reanalyze their original data, available through the \texttt{endorse} R package.
 
 Their interpretation has been influential. They write:
 \begin{quote}
@@ -225,22 +227,24 @@ These claims treat the sign of the ATE as a direct measure of sentiment levels. 
 
 \subsection{Applying the Framework}
 
-\citeauthor{blair2013poverty}'s regression yields a constant of $\alpha = 0.80$ and treatment effect of $\beta = -0.011$, giving a treatment group average of 0.789. \Cref{tab:blair_reinterpretation} applies the binary switching model to each militant group.
+Reanalyzing the original data across all 16 policy $\times$ endorser pairs, the average control mean is $\alpha = 0.736$ and the average treatment effect is $\beta = -0.013$, giving an average treatment group mean of 0.723. Baseline support varies substantially across policies: from 67\% (Durand Line) to 83\% (Polio vaccination).
+
+\Cref{tab:blair_reinterpretation} applies all behavioral models to each militant group, averaging across policies. Under binary switching, implied support ranges from 71.8\% (Afghan Taliban) to 72.8\% (sectarian groups). Under symmetric effects with $d = 0.05$, these figures drop to 33--42\%.
 
 \begin{table}[H]
 \centering
-\caption{Implied Support by Group Under Binary Switching}
+\caption{Implied Support by Endorser Under Different Behavioral Models}
 \label{tab:blair_reinterpretation}
-\input{../tabs/blair_reinterpretation.tex}
+\input{../tabs/empirical_support.tex}
 \end{table}
 
-Under binary switching, implied support ranges from 78.5\% (Afghan Taliban) to 79.5\% (sectarian groups). Under symmetric effects with $d = 0.05$, these figures drop to roughly 35--45\%. The qualitative point holds across models: the data are not obviously consistent with ``low regard,'' but the precise level of support depends on which behavioral model one adopts.
+The qualitative point holds across models: the data are not obviously consistent with ``low regard,'' but the precise level of support depends on which behavioral model one adopts. Critically, the binary switching model is rejected by the variance test (\cref{tab:variance_test}), so the 72\% figure should be treated as an upper bound under a counterfactual assumption rather than a direct estimate.
 
 \subsection{Why the Sign Alone is Insufficient}
 
-The negative ATE tells us that more people switched away from the policy than toward it when the militant group endorsed it. Under every model considered, this means the net balance of switching tilts toward opposition. But with 80\% baseline support, even a slight negative tilt is consistent with majority support for the endorsing group under several plausible models.
+The negative ATE tells us that more people switched away from the policy than toward it when the militant group endorsed it. Under every model considered, this means the net balance of switching tilts toward opposition. But with 74\% baseline support, even a slight negative tilt is consistent with majority support for the endorsing group under several plausible models.
 
-The intuition is straightforward. Most respondents (80\%) support the policy in control. When the endorsement is introduced, some supporters of the militant group who did not previously support the policy now do, and some opponents of the militant group who previously supported the policy now withdraw. The net effect is slightly negative ($-1.1$ percentage points), meaning the second group slightly outweighs the first. But the first group could still be very large.
+The intuition is straightforward. Most respondents (74\%) support the policy in control. When the endorsement is introduced, some supporters of the militant group who did not previously support the policy now do, and some opponents of the militant group who previously supported the policy now withdraw. The net effect is slightly negative ($-1.3$ percentage points), meaning the second group slightly outweighs the first. But the first group could still be very large.
 
 \subsection{External Validation}
 
@@ -253,11 +257,20 @@ Part of this gap plausibly reflects social desirability bias and fear, which is 
 
 \subsection{Continuous Outcomes and the Variance Test}
 
-\citeauthor{blair2013poverty} measured responses on a 5-point scale rescaled to $[0,1]$. As noted in \cref{sec:framework}, binary switching predicts a bimodal treatment distribution concentrated at 0 and 1, with variance $p(1-p) \approx 0.166$. If the observed treatment variance is much smaller, binary switching is rejected as a descriptive model.
+\citeauthor{blair2013poverty} measured responses on a 5-point scale rescaled to $[0,1]$. As noted in \cref{sec:framework}, binary switching predicts a bimodal treatment distribution concentrated at 0 and 1, with variance $p(1-p)$. If the observed treatment variance is much smaller, binary switching is rejected as a descriptive model.
 
-The authors do not report treatment group variances separately, but the overall standard deviation of approximately 0.15 (implied by their characterization of the Afghan Taliban effect as ``roughly 10\% of a standard deviation'') suggests a variance of about 0.023, an order of magnitude below the binary switching prediction. This is strong evidence against the binary model as a literal description of the data.
+Reanalyzing the original data confirms this prediction is violated. \Cref{tab:variance_test} presents the variance test results across all 16 policy $\times$ endorser pairs. The average observed treatment variance is 0.082, compared to a predicted variance of 0.197 under binary switching---a ratio of 0.42. The pattern is consistent across all pairs, with ratios ranging from 0.35 to 0.47.
 
-The binary switching result $p = \alpha + \beta$ should therefore be understood as the estimate \emph{conditional on a model that the data likely reject}, rather than as a direct reading of the data. It remains useful as one end of the range, but should not be reported as a point estimate.
+\begin{table}[H]
+\centering
+\caption{Variance Test for Binary Switching Assumption}
+\label{tab:variance_test}
+\input{../tabs/variance_test.tex}
+\end{table}
+
+This is strong evidence against the binary model as a literal description of the data. Respondents are not clustering at the extremes of the scale; they use intermediate values, indicating that endorsement effects are smaller and more continuous than binary switching assumes.
+
+The binary switching result $p = \alpha + \beta$ should therefore be understood as the estimate \emph{conditional on a model that the data reject}, rather than as a direct reading of the data. It remains useful as one end of the range (an upper bound under the strongest possible reaction), but should not be reported as a point estimate.
 
 \subsection{Partial Awareness}
 
@@ -276,9 +289,9 @@ If we assume $\alpha_0 = \alpha$ (those without opinions on the group support th
 p &= \frac{\beta}{q} + \alpha
 \end{align}
 
-With $q = 0.7$, $\beta = -0.011$, and $\alpha = 0.80$: $p = -0.011/0.7 + 0.80 = 0.784$. This yields 78.4\% support among opinion-holders, close to the full-sample binary switching estimate.
+With $q = 0.7$, $\beta = -0.013$, and $\alpha = 0.736$: $p = -0.013/0.7 + 0.736 = 0.717$. This yields 71.7\% support among opinion-holders, close to the full-sample binary switching estimate of 72.3\%.
 
-If instead we drop the baseline constraint and use only the ATE with the standard partial awareness formula $\text{ATE} = q(2p - 1)$, we get $p = \beta/(2q) + 0.5 = -0.011/1.4 + 0.5 = 49.2\%$. The discrepancy between 78.4\% and 49.2\% illustrates again how much baseline information matters, and how different auxiliary assumptions drive the results.
+If instead we drop the baseline constraint and use only the ATE with the standard partial awareness formula $\text{ATE} = q(2p - 1)$, we get $p = \beta/(2q) + 0.5 = -0.013/1.4 + 0.5 = 49.1\%$. The discrepancy between 71.7\% and 49.1\% illustrates again how much baseline information matters, and how different auxiliary assumptions drive the results.
 
 \subsection{Heterogeneous Effects via Simulation}
 
@@ -304,7 +317,7 @@ The wide gap between 46\% and 92\% reflects the fundamental underidentification:
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{method_comparison.pdf}
-\caption{Implied support varies substantially across behavioral models, from 39\% (symmetric effects) to 99\% (extreme opponent reaction). No single estimate is privileged without a defended choice of model.}
+\caption{Implied support varies substantially across behavioral models, from 37\% (symmetric effects) to 99\% (extreme opponent reaction). No single estimate is privileged without a defended choice of model.}
 \label{fig:method_comparison}
 \end{figure}
 
@@ -315,16 +328,16 @@ The wide gap between 46\% and 92\% reflects the fundamental underidentification:
 \label{fig:sensitivity}
 \end{figure}
 
-The range of estimates---39\% to 99\%---is wide. This width is not a weakness of the analysis; it reflects the genuine underidentification of the problem. The data constrain the supporter proportion only loosely without a commitment to a specific behavioral model.
+The range of estimates---37\% to 99\%---is wide. This width is not a weakness of the analysis; it reflects the genuine underidentification of the problem. The data constrain the supporter proportion only loosely without a commitment to a specific behavioral model.
 
 \section{Discussion}
 \label{sec:discussion}
 
 \subsection{What Can We Conclude About \citeauthor{blair2013poverty}?}
 
-\citeauthor{blair2013poverty}'s characterization of ``low regard'' is not supported by any of the models considered here. Under every specification---including the one most favorable to their interpretation (symmetric effects with $d = 0.05$, yielding 39\%)---the implied support level is far from negligible. Under several plausible models, it exceeds 50\%. Their conclusion follows the sign of the ATE but not the magnitude of support it implies.
+\citeauthor{blair2013poverty}'s characterization of ``low regard'' is not supported by any of the models considered here. Under every specification---including the one most favorable to their interpretation (symmetric effects with $d = 0.05$, yielding 37\%)---the implied support level is far from negligible. Under several plausible models, it exceeds 50\%. Their conclusion follows the sign of the ATE but not the magnitude of support it implies.
 
-At the same time, the claim that ``79\% of Pakistanis support militant groups'' requires the binary switching model, which their own data likely reject on variance grounds. A more defensible summary is: the data are consistent with supporter proportions ranging from roughly 40\% to 80\%, depending on assumptions about individual switching behavior. The ATE sign tells us the net balance tips toward opposition, but the level of support could be anywhere in this range.
+At the same time, the claim that ``72\% of Pakistanis support militant groups'' requires the binary switching model, which the data reject on variance grounds. A more defensible summary is: the data are consistent with supporter proportions ranging from roughly 37\% to 72\%, depending on assumptions about individual switching behavior. The ATE sign tells us the net balance tips toward opposition, but the level of support could be anywhere in this range.
 
 \subsection{Guidance for Practitioners}
 
@@ -334,7 +347,7 @@ Three recommendations follow from this analysis.
 
 \textbf{Do not equate the ATE sign with ``sentiment.''} The sign tells you which switching force dominates, not whether the group is popular or unpopular. With high baseline support, negative ATEs can coexist with majority support under multiple behavioral models.
 
-\textbf{Discuss identifying assumptions explicitly.} Moving from ATEs to support levels requires a behavioral model. Authors should state which model they assume, defend it, and report how sensitive results are to alternatives. The variance test described in \cref{sec:framework} provides a simple diagnostic for binary switching.
+\textbf{Discuss identifying assumptions explicitly.} Moving from ATEs to support levels requires a behavioral model. Authors should state which model they assume, defend it, and report how sensitive results are to alternatives. The variance test described in \cref{sec:framework} provides a simple diagnostic for binary switching. As demonstrated here, this test can be performed on the original data and provides clear evidence against (or for) the binary switching assumption.
 
 \subsection{Policy Selection}
 
@@ -346,14 +359,14 @@ The framework treats the constant term as the baseline support level. In practic
 
 The framework also assumes the endorsement manipulation is credible. If respondents doubt that militant groups actually endorse benign policies, the measured effects understate true attitudes, and all estimates here are attenuated.
 
-Finally, our analysis takes \citeauthor{blair2013poverty}'s reported estimates at face value. A full reanalysis with access to the microdata could test the variance implication directly and estimate models with heterogeneous switching.
+The variance test rejects binary switching but cannot directly identify which softer model best describes the data. The 37\% estimate under symmetric effects and the 40\% estimate under normal heterogeneity are illustrative rather than definitive; the true individual-level heterogeneity structure remains unknown.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-\citet{blair2013poverty} conclude that Pakistanis hold militant groups in ``low regard'' based on small negative treatment effects. This inference is wrong. The sign of the ATE reflects the balance of switchers, not the level of support. Using both the treatment effect and baseline information, we derive a range of supporter proportions under different behavioral models: from 39\% (symmetric effects) to 99\% (extreme opponent reaction), with the binary switching model at 79\%.
+\citet{blair2013poverty} conclude that Pakistanis hold militant groups in ``low regard'' based on small negative treatment effects. This inference is wrong. The sign of the ATE reflects the balance of switchers, not the level of support. Reanalyzing their original data, I derive a range of supporter proportions under different behavioral models: from 37\% (symmetric effects) to 99\% (extreme opponent reaction), with the binary switching model at 72\%.
 
-No model considered here supports the characterization of ``low regard.'' But the precise level of support is sensitive to assumptions the data cannot adjudicate. The binary switching estimate of 79\% requires an assumption that the data likely reject on variance grounds. The symmetric effects estimate of 39\%, while lower, still represents a substantial minority rather than negligible support.
+No model considered here supports the characterization of ``low regard.'' But the precise level of support is sensitive to assumptions the data cannot adjudicate. Crucially, the variance test rejects the binary switching assumption: observed treatment variance is only 42\% of what binary switching predicts. The 72\% binary switching estimate should therefore be treated as an upper bound under a counterfactual, not a point estimate. The symmetric effects estimate of 37\%, while lower, still represents a substantial minority rather than negligible support.
 
 The broader methodological point is that endorsement experiments identify average treatment effects well but are underidentified for the quantity researchers most want: the proportion of supporters. Moving from ATEs to support levels requires explicit behavioral assumptions. Researchers should report treatment group averages, discuss identifying assumptions, and present sensitivity analyses rather than drawing ``sentiment'' conclusions from the sign of the ATE alone.
 

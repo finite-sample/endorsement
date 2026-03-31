@@ -29,16 +29,17 @@ TABS_DIR = os.path.join(ROOT_DIR, "tabs")
 FIGS_DIR = os.path.join(ROOT_DIR, "figs")
 
 # ---------------------------------------------------------------------------
-# Parameters from Blair et al. (2013)
+# Empirical parameters from Blair et al. (2013) data (via endorse R package)
 # ---------------------------------------------------------------------------
-BASELINE = 0.80          # constant term (control group average)
-ATE_OVERALL = -0.011     # pooled ATE across groups
+BASELINE = 0.736         # overall control mean across all policy x endorser pairs
+ATE_OVERALL = -0.013     # overall ATE across all policy x endorser pairs
 
+# ATEs by endorser group (averaged across policies)
 GROUPS = {
-    "Afghan Taliban":          -0.015,
-    "Pakistani Taliban (TTP)": -0.011,
-    "Kashmiri Militants":      -0.010,
-    "Sectarian Groups":        -0.005,
+    "Afghan Taliban":      -0.0175,
+    "Al-Qaeda":            -0.0138,
+    "Kashmiri Militants":  -0.0111,
+    "Sectarian Groups":    -0.0082,
 }
 
 # Symmetric-effects magnitude used in the paper
