@@ -1,85 +1,63 @@
-## Inferring Support From Endorsement Experiments
+# Do Pakistanis Hold Militant Groups in Low Regard?
 
-## Manuscript
+[![ci](https://github.com/finite-sample/endorsement/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/endorsement/actions/workflows/ci.yml)
 
-* [Manuscript (pdf and .tex)](ms/)
+Reanalysis of Blair, Fair, Malhotra, and Shapiro (2013), "Poverty and Support for Militant Politics: Evidence from Pakistan." The manuscript, the data, and every number in between are in this repository. Read the paper at [ms/endorsement.pdf](ms/endorsement.pdf).
 
-## The Problem: Endorsement Experiments Are Underidentified
+## The Finding
 
-Blair et al. (2013) conducted endorsement experiments in Pakistan and concluded:
+Blair et al. concluded that "Pakistanis in general are weakly negative toward Islamist militant organizations" and that the negative, small, mostly significant treatment effects suggest "Pakistanis hold militant groups in low regard." Refitting their data with the measurement model the endorsement-experiment literature itself developed (Bullock, Imai, and Shapiro 2011), roughly two in five Pakistanis react positively to a militant group's endorsement:
 
-> "We find that Pakistanis in general are **weakly negative** toward Islamist militant organizations."
+| Group | Share reacting positively | 95% credible interval |
+|-------|--------------------------|-----------------------|
+| Kashmiri tanzeems | 45% | [25%, 58%] |
+| Afghan Taliban | 32% | [2%, 49%] |
+| Al-Qaeda | 47% | [40%, 54%] |
+| Sectarian tanzeems | 49% | [38%, 57%] |
+| Average | 43% | [32%, 53%] |
 
-> "The coefficients are negative and statistically significant...suggesting that **Pakistanis hold militant groups in low regard**."
+The mean reaction is negative but tiny, at most 0.08 ideal-point standard deviations, while the dispersion of reactions is several times larger. With heterogeneity that wide around a mean that small, "weakly negative on average" and "two in five react positively" are the same fact. The sign of the ATE measures the direction of the average, not the level of support.
 
-**This interpretation is incomplete.**
-
-The sign of the average treatment effect (ATE) tells us the balance of switchers, not the level of support. With 80% baseline policy support and a -0.011 treatment effect, implied support for militant groups ranges from **39% to 99%** depending on assumptions about individual switching behavior:
-
-| Model | Assumption | Implied Support |
-|-------|------------|-----------------|
-| Symmetric effects | Both groups shift ±0.05 | 39% |
-| Binary switching | All supporters → 1, opponents → 0 | 79% |
-| Extreme reaction | Opponents react maximally | 99% |
-
-No model supports Blair et al.'s characterization of "low regard." But the precise level of support is sensitive to assumptions the data cannot adjudicate.
-
-See the [manuscript](ms/endorsement.pdf) for the full analysis.
-
-## The Identification Problem
-
-The ATE decomposes as:
-```
-β = p × δ⁺ + (1-p) × δ⁻
-```
-
-Three unknowns (p, δ⁺, δ⁻), one equation. The system is underidentified without restrictions on switching behavior. Different assumptions yield very different estimates:
-
-| Without Baseline | With Baseline (α=0.8) | Model |
-|------------------|----------------------|-------|
-| Max 49.5% | 39% | Symmetric (d=0.05) |
-| Max 49.5% | 79% | Binary switching |
-| Max 49.5% | 99% | Extreme reaction |
-
-**Key insight:** Baseline information is crucial and routinely ignored.
-
-## Guidance for Practitioners
-
-1. **Report treatment group averages, not just ATEs.** Under binary switching, the treatment average directly estimates the supporter proportion.
-
-2. **Do not equate the ATE sign with "sentiment."** The sign tells you which switching force dominates, not whether the group is popular.
-
-3. **Discuss identifying assumptions explicitly.** Present sensitivity analyses across plausible behavioral models.
-
-4. **Test the binary switching assumption.** Compare treatment variance to p(1-p). Large discrepancies indicate binary switching is inappropriate.
+The paper also shows the general point: the ATE decomposes as beta = p * delta_plus + (1 - p) * delta_minus, three unknowns in one equation, so explicit behavioral models map the same ATE (-1.3 points) and baseline (74%) to supporter shares from 18% to 99%, and assumption-free coupling bounds place the share of positive reactions anywhere between 1% and 58%. Blair et al.'s own subgroup estimates corroborate the heterogeneity reading: their middle-class treatment effect is between -0.6 and 0.1 percentage points, indistinguishable from zero.
 
 ## Reproducing the Paper
 
+Requirements: Python 3.10+ with the packages in `requirements.txt`, R with the `endorse` package (installed automatically by the download script), and a LaTeX distribution with `pdflatex` and `bibtex`.
+
 ```bash
-python3 scripts/generate_tables_and_figures.py
-cd ms && pdflatex endorsement.tex
+make tables     # regenerate tabs/ and figs/ from data (seconds, deterministic)
+make pdf        # compile ms/endorsement.pdf
+make check      # regenerated tables must match the committed ones; pdf must compile clean
+make endorse    # refit the measurement model: 3 chains x 3 specifications, 1-2 hours
+make lint       # black, isort, flake8
 ```
 
-## File Structure
+The expensive MCMC step writes posterior summaries to `data/endorse_*.csv`, which are committed, so `make tables` and `make check` never refit the model. `make endorse` reruns the fits from scratch (three overdispersed chains per specification, following Bullock et al.'s protocol) and prints Gelman-Rubin statistics and effective sample sizes.
+
+## Data
+
+`data/pakistan_endorsement.csv` is the `pakistan` dataset shipped with the [endorse](https://CRAN.R-project.org/package=endorse) R package (n = 5,212; regenerate it with `Rscript scripts/download_blair_data.R`). Endorser codes, confirmed against Blair et al.'s Table 1: a = control, b = Kashmiri tanzeems, c = Afghan Taliban, d = al-Qa'ida, e = sectarian tanzeems. `data/dataverse/` holds Blair et al.'s original replication files for reference, including their paper and Stata code.
+
+## Repository Layout
 
 ```
 ├── ms/endorsement.tex                      # Manuscript
-├── scripts/generate_tables_and_figures.py  # Generates tabs/ and figs/
-├── tabs/                                   # LaTeX tables for manuscript
-├── figs/                                   # Figures for manuscript
-└── README.md
+├── scripts/fit_endorse.R                   # Measurement-model fits (writes data/endorse_*.csv)
+├── scripts/generate_tables_and_figures.py  # Single writer of tabs/ and figs/
+├── scripts/analyze_blair_data.py           # Console diagnostics, writes nothing
+├── scripts/download_blair_data.R           # Regenerates data/pakistan_endorsement.csv
+├── data/                                   # Microdata, posterior summaries, dataverse files
+├── tabs/, figs/                            # Generated exhibits
+└── Makefile                                # tables, pdf, check, endorse, lint
 ```
 
 ## Citation
 
 ```
-Sood, Gaurav. (2025). Inferring Support from Endorsement Experiments.
+Sood, Gaurav. (2026). Do Pakistanis Hold Militant Groups in Low Regard?
+https://github.com/finite-sample/endorsement
 ```
 
-## Key Takeaways
+## License
 
-1. **Endorsement experiments are underidentified** for the proportion of supporters without behavioral assumptions
-2. **Baseline support information is crucial** and changes estimates dramatically
-3. **The ATE sign does not measure "sentiment"** - it measures the balance of switchers
-4. **Report ranges, not point estimates** unless you can defend a specific behavioral model
-5. **Binary switching is testable** via the variance implication - and often rejected
+Code and manuscript are MIT-licensed (see [LICENSE](LICENSE)). The files under `data/dataverse/` are Blair et al.'s replication materials, redistributed for reference under their original terms; `data/pakistan_endorsement.csv` is exported from the GPL-licensed `endorse` R package.

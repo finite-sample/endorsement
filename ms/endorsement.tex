@@ -73,7 +73,7 @@
 
 \usepackage{tocloft}
 
-\title{Inferring Support from Endorsement Experiments\thanks{\href{http://github.com/soodoku/endorsement}{http://github.com/soodoku/endorsement}.}}
+\title{Do Pakistanis Hold Militant Groups in Low Regard?\thanks{\href{https://github.com/finite-sample/endorsement}{https://github.com/finite-sample/endorsement}.}}
 
 \author{Gaurav Sood\thanks{Gaurav can be reached at \href{mailto:gsood07@gmail.com}{\footnotesize{\texttt{gsood07@gmail.com}}}}\vspace{.5cm}}
 
@@ -84,20 +84,18 @@
 \maketitle
 
 \begin{abstract}
-\noindent Endorsement experiments measure how group endorsements affect policy support, and researchers routinely interpret the sign of the average treatment effect as indicating ``sentiment'' toward the endorsing group. I show that this interpretation does not follow when applied to levels of support: the ATE reflects the balance of switchers, not the proportion of supporters. Using both the treatment effect and the baseline support level, I derive bounds on the proportion of supporters under a family of behavioral models. Applied to \citet{blair2013poverty}, where baseline policy support is 74\% and the average treatment effect is $-1.3$ percentage points, the estimates range from 37\% to 99\% depending on assumptions about individual-level switching behavior, with the binary switching model yielding 72\% and a discrete-scale model that accounts for ceiling effects on the 5-point response scale yielding 59\%. No model considered here supports their characterization of ``low regard'' for militant groups. The precise level of support depends on assumptions the data cannot adjudicate, but the broader point is that endorsement experiments are underidentified for the quantity researchers most want to estimate---the proportion of supporters---without strong auxiliary assumptions about individual behavior.
+\noindent \citet{blair2013poverty} conclude from endorsement experiments that Pakistanis hold militant groups in ``low regard'': the groups' endorsements slightly reduce stated policy support, and the authors read the negative sign as sentiment. I reanalyze their data with the measurement model developed for endorsement experiments \citep{bullock2011statistical} and find that roughly two in five Pakistanis react positively to a militant group's endorsement (43\% averaged across the four groups studied; 95\% credible interval 32--53\%). The mean reaction is negative but tiny, at most 0.08 ideal-point standard deviations, while the dispersion of reactions is several times larger, so a weakly negative average coexists with widespread favorable reactions. The sign-to-sentiment inference also fails in general: the ATE identifies the balance of switchers, not the proportion of supporters. Explicit behavioral models map the same ATE and baseline to supporter shares from 18\% to 99\%, and assumption-free bounds place the share of positive reactions between 1\% and 58\%. Blair et al.'s own subgroup results corroborate the heterogeneity reading: their middle-class treatment effect is indistinguishable from zero. Endorsement experiments can speak to levels of support, but only through explicit behavioral models; the sign of the average treatment effect alone carries almost no information about how many people support a group.
 \end{abstract}
 
 \section{Introduction}
 
-\citet{blair2013poverty} conclude that Pakistanis hold militant groups in ``low regard'' based on small negative treatment effects from endorsement experiments. This inference---from the sign of the ATE to the level of support---does not follow without additional assumptions about individual switching behavior. The sign of the average treatment effect (ATE) tells us the balance of switchers, not the level of support for the endorsing group. With high baseline policy support, a small negative effect is consistent with a wide range of supporter proportions, including large majorities.
+Do Pakistanis hold militant groups in low regard? \citet{blair2013poverty} conclude they do, from endorsement experiments in which militant groups' endorsements slightly reduced stated support for policies: the average treatment effects are negative, small, and mostly statistically significant, and the authors read the sign as sentiment. Reanalyzing their data with the measurement model the endorsement-experiment literature itself developed \citep{bullock2011statistical}, I find that roughly two in five Pakistanis react positively to a militant group's endorsement: 43\% on average across the four groups studied (95\% credible interval 32--53\%), with a mean reaction of at most 0.08 ideal-point standard deviations. A tiny negative mean sits on top of wide disagreement, so ``weakly negative on average'' and ``two in five react positively'' are both true. The first fact cannot carry their conclusion: low regard is a claim about the level of support, and the level is what the sign of an average treatment effect (ATE) does not measure.
 
-The problem is general. Endorsement experiments identify the ATE under standard exclusion restrictions, but the ATE alone does not identify the proportion of supporters. Mapping from the ATE to a supporter proportion requires auxiliary assumptions about individual switching behavior. Under binary switching (every supporter moves to 1, every opponent moves to 0), the treatment group average equals the supporter proportion exactly. Under symmetric small effects ($\pm 0.05$), the same ATE implies only 37\% support. The data cannot distinguish these models.
+The inferential gap is general. The ATE from an endorsement experiment is the balance of two forces, supporters of the group raising their stated policy support and opponents lowering theirs. Its sign says which force wins on average, not how many people are on each side. Mapping the ATE to a supporter proportion requires a behavioral model, and the choice matters: explicit models applied to the same two numbers, an ATE of $-1.3$ percentage points and a baseline of 74\%, imply supporter shares anywhere from 18\% to 99\%. Assumption-free bounds are hardly tighter: any share of positive reactions between 1\% and 58\% is consistent with the observed response distributions.
 
-This paper develops a framework for what endorsement experiments can and cannot tell us about support levels. The framework uses both the treatment effect and the baseline support level (the regression constant), and yields bounds under different assumptions about individual behavior. The key insight is simple: baseline support information is crucial and routinely ignored, and the range of estimates compatible with a given ATE is wide enough that ``sentiment'' interpretations based on the sign alone are unreliable.
+Independent evidence points the same way as the model. Blair et al.'s own subgroup estimates put the middle-class treatment effect between $-0.6$ and $0.1$ percentage points, indistinguishable from zero, with the negative average driven by the poor. \citet{bullock2011statistical}, fitting the hierarchical version of the model to these data, find outright positive support in parts of Punjab. And the model-based estimate of 43\% lies below the ceiling implied by direct polling once item nonresponse is counted (55\% for the Afghan Taliban in Pew's 2012 survey).
 
-Applied to \citet{blair2013poverty}, where baseline support is 74\% and the average treatment effect is $-1.3$ percentage points, the framework yields estimates ranging from 37\% (symmetric effects) to 99\% (extreme opponent reaction), with the binary switching model at 72\%. None of these estimates support their characterization of ``low regard.'' But the 72\% figure requires a strong behavioral assumption that is testable and likely violated in their data.
-
-This paper proceeds as follows. \Cref{sec:background} reviews endorsement experiments and the interpretation problem. \Cref{sec:framework} develops the inferential framework. \Cref{sec:application} reanalyzes \citeauthor{blair2013poverty}. \Cref{sec:discussion} discusses implications for practitioners. \Cref{sec:conclusion} concludes.
+\Cref{sec:background} reviews the design, \cref{sec:data} the data, \cref{sec:model} the model-based estimates, \cref{sec:framework,sec:application} what can be inferred without the model, and \cref{sec:discussion} what practitioners should report.
 
 \section{Background: Endorsement Experiments}
 \label{sec:background}
@@ -124,8 +122,44 @@ Consider an ATE of $-0.01$ (a 1 percentage point decrease in policy support). Th
 
 The core difficulty is that endorsement experiments are designed to identify the ATE, not the proportion of supporters. Moving from the ATE to a supporter proportion requires a model of individual switching behavior, and different models yield very different answers. This is not a failure of the experimental design; it is a fundamental feature of the inferential problem. The ATE is a well-identified causal quantity. The supporter proportion is a structural parameter that requires additional assumptions.
 
+\section{The Experiment and Data}
+\label{sec:data}
+
+\citet{blair2013poverty} conducted endorsement experiments in Pakistan measuring attitudes toward four militant groups: the Kashmiri tanzeems, the Afghan Taliban, al-Qa'ida, and the sectarian tanzeems. Respondents were asked about support for four policies (polio vaccination, FCR reform, Durand Line, curriculum standardization) with and without militant group endorsements, on a 5-point scale rescaled to $[0,1]$. Their survey sampled 6,000 Pakistani adults; the analysis file distributed with the \texttt{endorse} R package \citep{shiraito2022endorse}, which I reanalyze, contains the 5,212 respondents with complete responses.\footnote{I use the unweighted microdata. \citeauthor{blair2013poverty} weight for oversampling in Balochistan and Khyber Pakhtunkhwa; their weighted Table 1 reports a baseline of 0.796 and an average treatment effect of $-0.011$, against 0.736 and $-0.013$ unweighted here. The difference runs in one direction for the analysis below: with the weighted numbers, the binary switching estimate of \cref{sec:application} rises from 72\% to 79\%. Sampling uncertainty is second order throughout: the pooled ATE carries a respondent-clustered standard error of about 0.005, so the width of the ranges reported below reflects model uncertainty, not noise.}
+
+Their interpretation has been influential. They write: ``We find that Pakistanis in general are weakly negative toward Islamist militant organizations'' and ``The coefficients are negative and statistically significant at the 10\% level for all but the sectarian tanzeems, suggesting that Pakistanis hold militant groups in low regard.'' The conclusion repeats the claim as the first of their empirical patterns. This follows the standard practice of interpreting the ATE sign as a summary of group-level sentiment. The rest of the paper asks whether that conclusion survives when the mapping from effects to levels is made explicit.
+
+\section{Model-Based Estimates of Support}
+\label{sec:model}
+
+The endorsement-experiment literature has a standard answer to the level question: the measurement model of \citet{bullock2011statistical}, developed on these very data. Each respondent holds a latent position $x_i$ on a policy-support scale, and answers each question according to that position, through question-specific cutpoints (an ordinal probit). An endorsement by group $k$ shifts the respondent's position by a person-specific reaction $s_{ik} \sim \mathcal{N}(\lambda_k, \omega_k^2)$. The mean reaction $\lambda_k$ is the model's measure of average affect toward group $k$; the dispersion $\omega_k$ measures how much respondents disagree. Because the model pools all four policy questions and uses the full ordinal response distribution, it identifies both parameters, and with them the quantity the ``low regard'' debate is about: the share of respondents who react positively to group $k$'s endorsement, $P(s_{ik} > 0) = \Phi(\lambda_k / \omega_k)$, which does not depend on the units of the latent scale. I fit the model to the Blair et al.\ data with the software written by the model's authors \citep{shiraito2022endorse}.\footnote{The specification pools questions (a common $\lambda_k$ across policies), without covariates. Following the protocol of \citet{bullock2011statistical}, I run three parallel chains with overdispersed starting values (200,000 iterations each, 20,000 discarded, every 40th draw kept) and monitor convergence with Gelman--Rubin statistics. All are below 1.02, and the smallest effective sample size across the $\lambda_k$ exceeds 1,300. Their simulation studies, calibrated to this dataset and its sample size of 5,212, show the model recovers these parameters with little bias and near-nominal coverage.}
+
+\Cref{tab:endorse_results} reports the results. Averaging over the four groups, 43\% of Pakistanis react positively to a militant endorsement (95\% credible interval 32--53\%). Three groups sit just under one half: 45\% for the Kashmiri tanzeems, 47\% for al-Qa'ida, and 49\% for the sectarian tanzeems. The Afghan Taliban attract the fewest positive reactions, 32\%, and the least certainty: their interval runs from 2\% to 49\% because the estimated dispersion of reactions to them is small and weakly identified. Mean reactions are negative but tiny, between $-0.01$ and $-0.08$ ideal-point standard deviations, and only the Afghan Taliban's mean is reliably below zero (posterior probability 0.98). \citeauthor{blair2013poverty}'s own magnitude framing agrees: they describe their strongest effect, for the Afghan Taliban, as ``roughly 10\% of a standard deviation in support for policies in the control group.''
+
+\begin{table}[H]
+\centering
+\caption{Model-Based Estimates: Share Reacting Positively to Each Group's Endorsement. Mean reaction and reaction SD are in units of ideal-point standard deviations.}
+\label{tab:endorse_results}
+\input{../tabs/endorse_results.tex}
+\end{table}
+
+The configuration that produces these numbers is a small negative mean and a much larger dispersion: $\omega_k$ runs from roughly 0.2 to 0.5 ideal-point standard deviations, several times $|\lambda_k|$. When reactions are this heterogeneous around a mean this close to zero, ``weakly negative on average'' and ``two in five react positively'' are the same fact. The sign of the average is real; the inference from that sign to a population that holds militant groups in low regard is not.
+
+Both source papers corroborate the heterogeneity. \citet{blair2013poverty} report that the treatment effect for middle-class respondents is between $-0.6$ and $0.1$ percentage points across specifications, indistinguishable from zero; the negative average is driven by the poor, whose effect is $-1.9$ to $-2.6$ points (their Table 2). \citet{bullock2011statistical}, fitting the hierarchical version of the model to these data, find clearly positive support in parts of Punjab (three of four groups in Gujranwala) and negative support in Balochistan and NWFP, and no division that suffered more than 50 violent incidents in the prior year shows positive support for any group. An average near zero conceals structured variation; it does not measure consensus.
+
+The alternative specifications imply more positive reactions, not fewer (\cref{tab:endorse_robustness}). Adding individual covariates (gender, rurality, education, income) moves the average to 44\%; replacing the common mean reaction with division-level means, the specification \citeauthor{bullock2011statistical} themselves use, moves it to 49\% and tightens every interval. The Afghan Taliban estimate is the most specification-sensitive, rising from 32\% to 45\% in the hierarchical model.
+
+\begin{table}[H]
+\centering
+\caption{Robustness: Share Reacting Positively Across Model Specifications}
+\label{tab:endorse_robustness}
+\input{../tabs/endorse_robustness.tex}
+\end{table}
+
 \section{A Framework for Inference}
 \label{sec:framework}
+
+The estimates above lean on the measurement model's parametric assumptions: reactions are normal, and the ordinal scale identifies their dispersion. This section develops what can be said with less. A reader who accepts only the experimental design learns two numbers, the ATE and the baseline, and this section maps them to supporter proportions under explicit behavioral models. The exercise shows both why the sign-to-sentiment inference fails in general and how wide the honest range is.
 
 \subsection{Setup}
 
@@ -171,7 +205,7 @@ Without binary switching, the analyst faces the decomposition in \cref{eq:ate_de
 p = \frac{\beta}{2d} + \frac{1}{2}
 \end{align}
 
-With $d = 0.05$ (a moderate shift on a $[0,1]$ scale): $p = -0.013/0.1 + 0.5 = 0.37$, or 37\%.
+With $d = 0.05$ (a moderate shift on a $[0,1]$ scale): $p = -0.013/0.1 + 0.5 = 0.37$, or 37\%. The choice of $d$ belongs to the analyst, not the data: $d = 0.02$ gives 18\%.
 
 \textbf{Asymmetric extreme reaction.} If opponents react maximally ($\delta^- = -1$, moving to 0) while supporters are unaffected ($\delta^+ = 0$):
 \begin{align}
@@ -185,30 +219,31 @@ With $\beta = -0.013$: $p = 0.987$, or 99\%.
 P(\delta_i > 0) = 1 - \Phi\left(\frac{-\beta}{\sigma}\right)
 \end{align}
 
-With $\beta = -0.013$ and $\sigma = 0.05$: $P(\delta_i > 0) \approx 40\%$.
+With $\beta = -0.013$ and $\sigma = 0.05$: $P(\delta_i > 0) \approx 40\%$. The measurement model of \cref{sec:model} is the disciplined member of this family: it estimates the dispersion from the ordinal response distribution instead of assuming it, and arrives at 43\%.
 
-These models yield a wide range of implied support---from 37\% to 99\%---depending on what one assumes about individual switching behavior. \Cref{sec:application} applies them to the \citeauthor{blair2013poverty} data.
+These models yield a wide range of implied support---from 18\% to 99\%---depending on what one assumes about individual switching behavior. \Cref{sec:application} applies them to the \citeauthor{blair2013poverty} data.
 
 \subsection{What Baseline Information Buys}
 
-The baseline (constant term) contributes in two ways. First, under binary switching, it provides the second equation needed for exact identification (\cref{eq:binary_switching}). Without it, the binary framework yields only $p_{\max} = (\beta + 1)/2 = 49.4\%$, which is far from the 72.3\% obtained with the constant.
+The baseline (constant term) contributes in two ways. First, under binary switching, it provides the second equation needed for exact identification (\cref{eq:binary_switching}). Without it, binary switching says only that $p = \alpha + \beta$ for an unknown $\alpha \in [0,1]$: any supporter proportion between 0\% and $1 + \beta = 98.7\%$ is consistent with the data. Even the strongest behavioral assumption is uninformative about $p$ until the constant pins it down at 72.3\%.
 
 Second, even without binary switching, the baseline constrains the plausible range. A control average of 74\% means that 74\% of respondents support the policy absent the endorsement cue. Any model of switching must be consistent with this fact. Models that imply very low baseline support are ruled out.
 
 The contribution of baseline information is the most practically important finding of this paper. Many analyses of endorsement experiments report only the ATE and its sign. Reporting the treatment group average, or equivalently the constant and the ATE together, enables a much richer set of inferences. The estimate is also robust to partial awareness: if 30\% of respondents have no opinion about the endorsing group and are unaffected by the endorsement, the implied support among opinion-holders under binary switching is $\beta/q + \alpha = 72\%$, essentially unchanged.
 
-\section{Reanalyzing \citeauthor{blair2013poverty}}
+\section{Bounds and Sensitivity}
 \label{sec:application}
-
-\subsection{Data}
-
-\citet{blair2013poverty} conducted endorsement experiments in Pakistan measuring attitudes toward four militant groups (Afghan Taliban, Pakistani Taliban, Kashmiri militants, and sectarian organizations). Respondents were asked about support for four policies (polio vaccination, FCR reform, Durand Line, curriculum standardization) with and without militant group endorsements, on a 5-point scale rescaled to $[0,1]$. The sample comprised approximately 5,200 respondents in a nationally representative survey. I reanalyze their original data, available through the \texttt{endorse} R package \citep{bullock2011statistical}.\footnote{We use the unweighted microdata. \citeauthor{blair2013poverty} use survey weights to account for oversampling in Balochistan and Khyber Pakhtunkhwa; our unweighted estimates differ slightly from their Table 1 but the qualitative conclusions are unchanged.}
-
-Their interpretation has been influential. They write: ``We find that Pakistanis in general are \textbf{weakly negative} toward Islamist militant organizations'' and ``The coefficients are negative and statistically significant at the 10\% level for all but the sectarian tanzeems, suggesting that \textbf{Pakistanis hold militant groups in low regard}.'' This follows the standard practice of interpreting the ATE sign as a summary of group-level sentiment. The framework developed above shows why this step requires additional assumptions that, when made explicit, yield a wide range of support estimates.
 
 \subsection{Binary Switching and the Variance Test}
 
-Across all 16 policy $\times$ endorser combinations, the average control mean is $\alpha = 0.736$ and the average treatment effect is $\beta = -0.013$, giving an average treatment group mean of 0.723. Baseline support varies across policies: from 67\% (Durand Line) to 83\% (polio vaccination). Under binary switching, implied support ranges from 71.8\% to 72.7\% across groups.
+Across all 16 policy $\times$ endorser combinations, the average control mean is $\alpha = 0.736$ and the average treatment effect is $\beta = -0.013$, giving an average treatment group mean of 0.723. Baseline support varies across policies: from 67\% (Durand Line) to 83\% (polio vaccination). Under binary switching, implied support ranges from 71.8\% to 72.7\% across groups (\cref{tab:empirical_support}). The ordering is stable: the Afghan Taliban draw the most negative ATE and the lowest implied support under every model in the table.
+
+\begin{table}[H]
+\centering
+\caption{Implied Support by Endorser Under Different Behavioral Models}
+\label{tab:empirical_support}
+\input{../tabs/empirical_support.tex}
+\end{table}
 
 But the binary switching model is testable, and the data reject it. Binary switching predicts a treatment group standard deviation of approximately 0.45; the actual treatment standard deviation is 0.29. The variance ratio---observed to predicted---is 0.42 across groups (\cref{tab:variance_test}). Respondents use the full range of the 5-point scale, not just the endpoints.
 
@@ -219,13 +254,13 @@ But the binary switching model is testable, and the data reject it. Binary switc
 \input{../tabs/variance_test.tex}
 \end{table}
 
-Researchers can compute this diagnostic from standard regression output without microdata: given $\beta$, $\alpha$, and the outcome standard deviation $\sigma$, the variance ratio is $\sigma^2 / [(\alpha + \beta)(1 - \alpha - \beta)]$. A ratio well below 1 rejects binary switching.
+Researchers can compute this diagnostic from standard regression output without microdata: given $\beta$, $\alpha$, and the treatment-group standard deviation $\sigma$, the variance ratio is $\sigma^2 / [(\alpha + \beta)(1 - \alpha - \beta)]$. A ratio well below 1 rejects binary switching.
 
 \subsection{Ceiling Effects on the Discrete Scale}
 
 The 5-point scale creates a mechanical asymmetry that biases the ATE downward. With 42\% of control responses at 1.0 and 29\% at 0.75, supporters who are already at the ceiling cannot shift higher, while opponents at the ceiling can shift down freely. Over two-fifths of the positive-shift potential is lost to truncation.
 
-Formalizing: let each supporter shift up by $s$ categories (capped at 1) and each opponent shift down by $s$ categories (floored at 0). The effective average shifts, accounting for truncation, are $\bar{\delta}^+$ and $\bar{\delta}^-$. Solving $\beta = p \bar{\delta}^+ + (1-p)\bar{\delta}^-$ for $p$, a 1-category shift ($\pm 0.25$) yields 59\% support despite the negative ATE (\cref{tab:discrete_scale}). The ceiling effect explains part of why the ATE is negative: supporters' positive reactions are mechanically attenuated by the scale.
+Formalizing: let each supporter shift up by $s$ categories (capped at 1) and each opponent shift down by $s$ categories (floored at 0). The effective average shifts, accounting for truncation, are $\bar{\delta}^+$ and $\bar{\delta}^-$. Two assumptions do the work here: supporters and opponents share the response distribution observed in the control group, and every respondent shifts the same number of categories. Neither is testable with these data, so the estimates that follow are conditional on both. Solving $\beta = p \bar{\delta}^+ + (1-p)\bar{\delta}^-$ for $p$, a 1-category shift ($\pm 0.25$) yields 59\% support despite the negative ATE (\cref{tab:discrete_scale}). Larger assumed shifts imply more support (66\% at two categories, 70\% at three) because truncation bites harder on the up side. The ceiling effect explains part of why the ATE is negative: supporters' positive reactions are mechanically attenuated by the scale.
 
 \begin{table}[H]
 \centering
@@ -236,7 +271,7 @@ Formalizing: let each supporter shift up by $s$ categories (capped at 1) and eac
 
 \subsection{Implied Support Across Models}
 
-\Cref{tab:method_comparison} collects implied support under all models considered, from the softest (symmetric effects, 37\%) to the strongest (extreme opponent reaction, 99\%). \Cref{fig:method_comparison} and \cref{fig:sensitivity} display the range graphically.
+\Cref{tab:method_comparison} collects implied support under all models considered, from symmetric effects with $d = 0.02$ (18\%) to extreme opponent reaction (99\%). \Cref{fig:method_comparison} and \cref{fig:sensitivity} display the range graphically. The two symmetric rows make the menu dependence concrete: shrinking the arbitrary effect size $d$ from 0.05 to 0.02 cuts the implied supporter share from 37\% to 18\%, and nothing in the data disciplines the choice of $d$.
 
 \begin{table}[H]
 \centering
@@ -259,18 +294,29 @@ Formalizing: let each supporter shift up by $s$ categories (capped at 1) and eac
 \label{fig:sensitivity}
 \end{figure}
 
-The width of this range---37\% to 99\%---reflects the genuine underidentification of the problem. The data constrain the supporter proportion only loosely without a commitment to a specific behavioral model. But no model yields ``low regard.'' Even the most conservative estimate (symmetric effects at 37\%) describes a substantial minority, not negligible support. A model-free lower bound reinforces this: randomly pairing treatment and control observations, the treatment response exceeds the control response 46\% of the time. This requires no behavioral assumptions and falls in the middle of the parametric range.
+The width of this range---18\% to 99\%---reflects the genuine underidentification of the problem. The data constrain the supporter proportion only loosely without a commitment to a specific behavioral model, and the range includes low support: a claim that endorsement experiments refute ``low regard'' would itself require a defended model.
+
+A model-free calculation shows exactly how little the data alone pin down. The experiment identifies the two marginal distributions of responses, treated and untreated, but not the joint distribution linking them, and any pairing (coupling) of the two marginals is consistent with the data. Across all such pairings, the share of respondents whose response the endorsement strictly raises can be as low as 1\% or as high as 58\% (\cref{tab:pairing_bounds}). Randomly pairing treatment and control responses gives intermediate figures---the treated response is higher 34\% of the time, lower 37\%, and tied 29\%---but only the interval $[1\%, 58\%]$ is a bound. The interval spans the majority threshold: the data are consistent with almost no one reacting positively to the endorsement and with a substantial majority doing so. The bounds are nearly identical across the four groups.
+
+\begin{table}[H]
+\centering
+\caption{Random-Pairing Probabilities and Coupling Bounds on the Share of Positive Reactions}
+\label{tab:pairing_bounds}
+\input{../tabs/pairing_bounds.tex}
+\end{table}
 
 \subsection{External Validation}
 
-Direct polling on militant group support in Pakistan yields much lower figures. Pew Research Center surveys from 2012--2014 find 8--14\% favorable views of the Taliban and al Qaeda, with substantial fractions declining to offer an opinion---21\% to 41\% depending on the group and year \citep{pew2012attitudes, pew2013pakistan, pew2014extremism}. The gap between these figures and the endorsement experiment estimates (37--72\% depending on model) is large.
+Direct polling on militant group support in Pakistan yields much lower figures. Pew Research Center surveys from 2012--2014 find 8--14\% favorable views of the Taliban and al Qaeda, with substantial fractions declining to offer an opinion---21\% to 41\% depending on the group and year \citep{pew2012attitudes, pew2013pakistan, pew2014extremism}. The gap between these figures and the endorsement experiment estimates (18--72\% depending on model) is large.
 
-Part of this gap plausibly reflects social desirability bias and fear, which is precisely the motivation for indirect measurement. \citeauthor{blair2013poverty} themselves note that direct questions about militant groups in their 2009 survey produced nonresponse rates around 40\%, compared to under 8\% for the endorsement questions. But even assigning every nonrespondent to the support camp yields at most roughly 55\% (14\% favorable plus 41\% no opinion for the Afghan Taliban in 2012). This is below the binary switching estimate of 72\% but close to the discrete-scale estimate of 59\%. The external evidence does not decisively adjudicate between models, but it is most consistent with the middle of our range.
+Part of this gap plausibly reflects social desirability bias and fear, which is precisely the motivation for indirect measurement. \citeauthor{blair2013poverty} report item nonresponse of 6\% to 22\% on direct questions about militant groups in their survey, against 0.6\% to 7.6\% on the endorsement questions, and they note don't-know rates around 40\% on Pew's direct al-Qa'ida and Taliban favorability questions in 2008. But even assigning every nonrespondent to the support camp yields at most roughly 55\% (14\% favorable plus 41\% no opinion for the Afghan Taliban in 2012). This ceiling is below the binary switching estimate of 72\%, close to the discrete-scale estimate of 59\%, and comfortably above the model-based estimate of 43\%. The external evidence does not decisively adjudicate between models, but it is most consistent with the middle of the range, where the measurement model of \cref{sec:model} sits.
 
 \section{Discussion}
 \label{sec:discussion}
 
-Three recommendations follow from this analysis.
+Four recommendations follow from this analysis.
+
+\textbf{Report level implications, not only ATEs.} The measurement model of \cref{sec:model} turns the same data into a share of positive reactions with a credible interval. Reporting $P(s > 0)$ alongside the ATE answers the question readers actually ask, and the software to do so is mature \citep{shiraito2022endorse}.
 
 \textbf{Report treatment group averages, not just ATEs.} Under binary switching, the treatment average directly estimates the supporter proportion. Even when binary switching is implausible, the treatment average provides a useful anchor. Reporting only the ATE and its sign discards information.
 
@@ -281,11 +327,11 @@ Three recommendations follow from this analysis.
 \section{Conclusion}
 \label{sec:conclusion}
 
-\citet{blair2013poverty} conclude that Pakistanis hold militant groups in ``low regard'' based on small negative treatment effects. This inference does not follow. The sign of the ATE reflects the balance of switchers, not the level of support. Reanalyzing their original data, I derive a range of supporter proportions under different behavioral models: from 37\% (symmetric effects) to 99\% (extreme opponent reaction), with the binary switching model at 72\%.
+\citet{blair2013poverty} conclude from small negative treatment effects that Pakistanis hold militant groups in ``low regard.'' Their own data, run through the measurement model the endorsement-experiment literature built for this purpose, say something more uncomfortable: roughly two in five Pakistanis react positively to militant group endorsements (43\%, credible interval 32--53\%), because a mean reaction of at most 0.08 ideal-point standard deviations coexists with dispersion several times larger. ``Weakly negative on average'' is accurate. ``Low regard,'' as a description of the population, is not supported.
 
-The characterization of ``low regard'' does not follow from any model considered here. But the precise level of support is sensitive to assumptions the data cannot adjudicate. The binary switching estimate of 72\% requires an assumption that the data reject on variance grounds. The symmetric effects estimate of 37\%, while lower, still represents a substantial minority rather than negligible support. Two caveats apply: the interpretation of the constant as baseline support requires a correctly specified regression, and the framework assumes the endorsement manipulation is credible---if respondents doubt that militant groups endorse benign policies, the measured effects understate true attitudes.
+The reduced-form analysis explains why no reading of the sign alone could have settled this. The ATE identifies the balance of switchers, not the proportion of supporters: explicit behavioral models map the same ATE and baseline to supporter shares from 18\% to 99\%, and assumption-free bounds place the share of positive reactions between 1\% and 58\%. The measurement model's answer is one point in that set, distinguished by assumptions that are explicit and conventional, normal reactions with a dispersion identified from scale usage, rather than true by construction. Two caveats apply: the interpretation of the constant as baseline support requires a correctly specified regression, and every estimate assumes the endorsement manipulation is credible---if respondents doubt that militant groups endorse benign policies, the measured reactions understate true attitudes.
 
-The broader methodological point is that endorsement experiments identify average treatment effects well but are underidentified for the quantity researchers most want: the proportion of supporters. Moving from ATEs to support levels requires explicit behavioral assumptions. Researchers should report treatment group averages, discuss identifying assumptions, and present sensitivity analyses rather than drawing ``sentiment'' conclusions from the sign of the ATE alone.
+Endorsement experiments identify average treatment effects well but are underidentified for the quantity researchers most want: the proportion of supporters. Moving from effects to levels requires explicit behavioral assumptions. Researchers should report the level implications of their estimates under such models, report treatment group averages and baselines, and treat the sign of the ATE as what it is: the direction of the average, not the distribution of the population.
 
 \bibliographystyle{apalike}
 \bibliography{references}
