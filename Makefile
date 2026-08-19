@@ -26,8 +26,8 @@ pdf:
 check: tables
 	git diff --exit-code tabs
 	$(MAKE) pdf
-	@! grep -q "LaTeX Warning.*undefined" ms/endorsement.log || \
-	  (echo "undefined references in ms/endorsement.log" && exit 1)
+	@! grep -q "Warning.*undefined" ms/endorsement.log || \
+	  (echo "undefined references or citations in ms/endorsement.log" && exit 1)
 	@echo "check passed"
 
 lint:

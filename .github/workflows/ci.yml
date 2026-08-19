@@ -31,5 +31,7 @@ jobs:
         with:
           root_file: endorsement.tex
           working_directory: ms
-      - name: No unresolved references
-        run: "! grep -q 'LaTeX Warning.*undefined' ms/endorsement.log"
+      - name: No unresolved references or citations
+        # 'Warning.*undefined' also catches natbib's citation warnings,
+        # which do not carry the 'LaTeX Warning' prefix.
+        run: "! grep -q 'Warning.*undefined' ms/endorsement.log"
