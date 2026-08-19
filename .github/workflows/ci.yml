@@ -19,4 +19,17 @@ jobs:
       - run: flake8 scripts
       - run: python scripts/generate_tables_and_figures.py
       - name: Committed tables must match regenerated tables
+        # figs/ are excluded: matplotlib embeds timestamps, so figure PDFs
+        # are byte-unstable across runs even with unchanged code.
         run: git diff --exit-code tabs
+
+  pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: xu-cheng/latex-action@v4
+        with:
+          root_file: endorsement.tex
+          working_directory: ms
+      - name: No unresolved references
+        run: "! grep -q 'LaTeX Warning.*undefined' ms/endorsement.log"

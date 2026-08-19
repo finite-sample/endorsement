@@ -20,7 +20,9 @@ pdf:
 	pdflatex -interaction=nonstopmode endorsement.tex >/dev/null
 
 # Regenerating must not change any committed table, and the manuscript must
-# compile without unresolved references.
+# compile without unresolved references. figs/ are deliberately excluded from
+# the diff gate: matplotlib embeds timestamps, so the PDFs are byte-unstable
+# across runs even when the generating code is unchanged.
 check: tables
 	git diff --exit-code tabs
 	$(MAKE) pdf
