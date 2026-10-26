@@ -5,33 +5,26 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: r-lib/actions/setup-r@v2
         with:
-          python-version: "3.12"
-      - run: pip install -r requirements.txt black isort flake8
-      - run: black --check scripts
-      - run: isort --check-only scripts
-      - run: flake8 scripts
-      - run: python scripts/generate_tables_and_figures.py
-      - name: Committed tables must match regenerated tables
-        # figs/ are excluded: matplotlib embeds timestamps, so figure PDFs
-        # are byte-unstable across runs even with unchanged code.
-        run: git diff --exit-code tabs
-
-  pdf:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+          r-version: '4.6.0'
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-renv@v2
+      - run: make lint test analysis
+      - name: Generated text is current
+        run: git diff --exit-code tabs README.md
       - uses: xu-cheng/latex-action@v4
         with:
           root_file: endorsement.tex
           working_directory: ms
-      - name: No unresolved references or citations
-        # 'Warning.*undefined' also catches natbib's citation warnings,
-        # which do not carry the 'LaTeX Warning' prefix.
-        run: "! grep -q 'Warning.*undefined' ms/endorsement.log"
+          latexmk_use_xelatex: true
+      - run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: make check-pdf

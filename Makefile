@@ -1,38 +1,56 @@
-PY = python3
+RSCRIPT = Rscript
 
-all: tables pdf
+all: paper
 
-tables:
-	$(PY) scripts/generate_tables_and_figures.py
+restore:
+	$(RSCRIPT) -e 'renv::restore(prompt = FALSE)'
 
-# Expensive MCMC step: refits the measurement model (three chains per
-# specification) and rewrites data/endorse_*.csv, the inputs to `tables`.
-endorse:
-	Rscript scripts/fit_endorse.R primary
-	Rscript scripts/fit_endorse.R covariates
-	Rscript scripts/fit_endorse.R hierarchical
-	$(PY) scripts/generate_tables_and_figures.py
+prepare:
+	$(RSCRIPT) scripts/run.R prepare
 
-pdf:
-	cd ms && pdflatex -interaction=nonstopmode endorsement.tex >/dev/null && \
-	bibtex endorsement >/dev/null && \
-	pdflatex -interaction=nonstopmode endorsement.tex >/dev/null && \
-	pdflatex -interaction=nonstopmode endorsement.tex >/dev/null
+fit:
+	$(RSCRIPT) scripts/run.R fit
 
-# Regenerating must not change any committed table, and the manuscript must
-# compile without unresolved references. figs/ are deliberately excluded from
-# the diff gate: matplotlib embeds timestamps, so the PDFs are byte-unstable
-# across runs even when the generating code is unchanged.
-check: tables
-	git diff --exit-code tabs
-	$(MAKE) pdf
-	@! grep -q "Warning.*undefined" ms/endorsement.log || \
-	  (echo "undefined references or citations in ms/endorsement.log" && exit 1)
-	@echo "check passed"
+summarize:
+	$(RSCRIPT) scripts/run.R summarize
+
+analysis:
+	$(RSCRIPT) scripts/run.R analysis
+
+manuscript:
+	cd ms && latexmk -xelatex -interaction=nonstopmode -halt-on-error endorsement.tex
+
+paper: analysis
+	$(MAKE) manuscript
+
+format:
+	$(RSCRIPT) -e 'styler::style_dir("R"); styler::style_dir("scripts"); styler::style_dir("tests")'
 
 lint:
-	black --check scripts
-	isort --check-only scripts
-	flake8 scripts
+	$(RSCRIPT) -e 'issues <- unlist(lapply(c("R", "scripts", "tests"), lintr::lint_dir), recursive = FALSE); print(issues); if (length(issues)) quit(status = 1)'
 
-.PHONY: all tables endorse pdf check lint
+test:
+	$(RSCRIPT) tests/testthat.R
+
+check: lint test
+	@set -eu; check_tmp=$$(mktemp -d); \
+	trap 'rm -rf "$$check_tmp"' EXIT; \
+	cp -R tabs "$$check_tmp/tabs"; cp README.md "$$check_tmp/README.md"; \
+	$(MAKE) analysis; \
+	diff -ru "$$check_tmp/tabs" tabs; \
+	diff -u "$$check_tmp/README.md" README.md
+	$(MAKE) manuscript
+	$(MAKE) check-pdf
+
+check-pdf:
+	@test -s ms/endorsement.pdf && test -s ms/endorsement.log
+	@! grep -Eq 'Warning.*undefined|Overfull' ms/endorsement.log
+	@set -eu; check_tmp=$$(mktemp); trap 'rm -f "$$check_tmp"' EXIT; \
+	pdftotext ms/endorsement.pdf "$$check_tmp"; ! grep -Fq '??' "$$check_tmp"
+
+ci-docker:
+	docker run --rm -v "$(CURDIR):/project" -w /project \
+	  -e RENV_PATHS_LIBRARY=/tmp/renv-library rocker/verse:4.6.0 \
+	  bash -c 'apt-get update && apt-get install -y poppler-utils && make restore check'
+
+.PHONY: all restore prepare fit summarize analysis manuscript paper format lint test check check-pdf ci-docker

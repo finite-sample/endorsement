@@ -1,0 +1,18 @@
+Package: endorsement
+Type: Project
+Title: Reanalysis of Militant Group Endorsements in Pakistan
+Version: 0.0.0.9000
+Authors@R: person("Gaurav", "Sood", email = "gsood07@gmail.com", role = c("aut", "cre"))
+Description: Reproducible analysis and manuscript for the Pakistan endorsement experiment.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.6.0)
+Imports:
+    coda,
+    endorse,
+    ggplot2
+Suggests:
+    lintr,
+    renv,
+    styler,
+    testthat
