@@ -181,6 +181,9 @@ paper_numbers <- function(analysis) {
   values <- c(values,
     MeanFallBound = percent(max(0, gap), 1), MeanRiseBound = percent(max(0, -gap), 1)
   )
+  values <- c(values,
+    MidpointDrop = number(-100 * analysis$person_means$bins$difference[analysis$person_means$bins$bin == "0.5"], 1)
+  )
   for (spec in c("covariates", "hierarchical")) {
     posterior <- analysis$posteriors[[spec]]
     label <- if (spec == "covariates") "CovariateShare" else "HierarchicalShare"
