@@ -6,29 +6,23 @@ Reanalysis of Blair, Fair, Malhotra, and Shapiro (2013), "Poverty and Support fo
 
 ## Findings
 
-A negative average endorsement effect does not identify how many people view the endorser favorably. This reanalysis distinguishes the average effect on stated policy support, the probability of a positive latent reaction under a measurement model, and bounds on increases in observed responses.
+Blair et al. read small negative endorsement effects as evidence that Pakistanis hold militant groups in low regard. Because each respondent answers four policy questions, the data can tell indifference from large reactions that offset. They show offsetting reactions.
 
 <!-- BEGIN GENERATED RESULTS -->
 
-In the unweighted analysis sample of 5,212 respondents, the fitted measurement model implies a **43% probability of a positive latent reaction** to an endorsement, averaged equally across four militant groups (95% credible interval 32%–53%).
+In the unweighted analysis sample of 5,212 respondents, endorsements lower stated policy support by -0.013 on the 0–1 scale (respondent-clustered SE 0.0052). That small average is the net of reactions in both directions, not the absence of reactions.
 
-| Endorser | Positive latent reaction | 95% credible interval |
-|---|---:|---:|
-| Kashmiri tanzeems | 45% | [25%, 58%] |
-| Afghan Taliban | 32% | [2%, 49%] |
-| Al-Qaeda | 47% | [40%, 54%] |
-| Sectarian tanzeems | 49% | [38%, 57%] |
-| Average | 43% | [32%, 53%] |
+- **Answers move together differently.** Under endorsement, the correlation between answers rises for five of six policy pairs (by 0.07 to 0.18) and falls for FCR and Durand (0.66 to 0.54).
+- **The midpoint empties in both directions.** Respondents whose four answers average the midpoint fall from 10.8% to 7.0%, with gains one step below and one step above.
+- **Opposition alone cannot do this.** Endorsed arms simulated from control respondents, tuned to the observed average effect, leave the midpoint share unchanged when reactions run only against the endorser.
 
-The pooled outcome mean is 0.736 without an endorsement and 0.723 with one, an average difference of -0.013 on the rescaled 0–1 response scale (respondent-clustered SE 0.0052). Bounds calculated from the pooled response marginals run from 1% to 58% for the fraction of person–policy responses strictly increased by endorsement. These are plug-in bounds, not confidence intervals or bounds on the latent reaction probability.
+How many respondents react favorably is not identified. The standard measurement model gives 43% (95% credible interval 32%–53%), but it treats a respondent's reactions as independent across questions, which the correlation changes contradict.
 
 <!-- END GENERATED RESULTS -->
 
-The latent probabilities depend on the ordinal measurement model and its normal reaction distribution. They describe the fitted unweighted sample from the 2009 survey, not a nationally representative estimate of supporter prevalence or the share favorable toward at least one group. Positive latent reactions can leave observed answer categories unchanged.
+The midpoint comparison assumes that how a respondent reacts is unrelated to where their answers would otherwise sit. The analysis is unweighted and uses the `endorse` package sample, which differs from the original article's sample and assignment exclusions; it describes that sample, not national prevalence.
 
-Illustrative moment restrictions produce widely different fractions, but those calculations are not a set of equally well-fitting models. Binary switching is contradicted by interior responses on the five-point scale. The extreme-opponent calculation describes an unaffected fraction, while the normal-effect calculation is a continuous approximation. Figure captions distinguish these quantities, and sensitivity curves omit infeasible parameter ranges.
-
-The package sample also differs from the original article's sample and assignment exclusions. The manuscript reports an exclusion sensitivity check for the pooled ATE. Population adjustment, Bayesian refits under those exclusions, prior sensitivity, and posterior predictive checks remain necessary before drawing stronger conclusions about national attitudes.
+`exploration/reaction-models/` records attempts to estimate the share reacting favorably with Stan and mixed models, the assumptions each made, and why none produced a reportable number.
 
 ## Reproducing the Paper
 
@@ -40,7 +34,7 @@ make paper
 make check
 ```
 
-`make paper` regenerates tables, the sensitivity figure, manuscript numbers, and the results block above, then compiles `ms/endorsement.pdf`. `make check` runs R lint and tests, checks that generated text is current, builds the PDF, and checks references. `make format` applies styler. `make ci-docker` runs the same checks in a standard Rocker image.
+`make paper` regenerates tables, manuscript numbers, and the results block above, then compiles `ms/endorsement.pdf`. `make check` runs R lint and tests, checks that generated text is current, builds the PDF, and checks references. `make format` applies styler. `make ci-docker` runs the same checks in a standard Rocker image.
 
 The committed posterior summaries let you rebuild the paper without rerunning MCMC. To refit all three specifications, run `make fit`; to refit one, run `Rscript scripts/run.R fit primary` (or `covariates` or `hierarchical`). Each uses three dispersed chains with 200,000 iterations, 20,000 burn-in iterations, and thinning by 40. Optional iteration settings follow the specification as three integers. Full fits can take hours.
 
@@ -57,20 +51,21 @@ Endorser codes, confirmed against Blair et al.'s Table 1: a = control, b = Kashm
 ```text
 R/
   data.R       Input validation, factor coding, and response reshaping
-  analysis.R   Effects, uncertainty, moment restrictions, and response bounds
+  analysis.R   Effects, within-respondent patterns, simulated worlds, restrictions, and bounds
   model.R      Three-chain measurement-model fitting and posterior summaries
-  paper.R      Tables, figure, numerical macros, and README results
+  paper.R      Tables, numerical macros, and README results
 scripts/run.R  Single entry point: prepare, fit, summarize, analysis
 tests/         testthat checks for data coding, estimands, bounds, and model summaries
 data/          Committed inputs and posterior summaries; local draws are ignored
 ms/            LaTeX source, bibliography, and compiled paper
-tabs/, figs/   Generated exhibits and numerical macros
+tabs/          Generated tables and numerical macros
+exploration/   Model attempts that did not produce a reportable estimate
 DESCRIPTION    Direct R dependencies
 renv.lock      Pinned R package versions
 Makefile       Build order and checks
 ```
 
-Calculations live in `R/analysis.R`; `R/paper.R` formats their results. There is one writer for each output. The method-comparison table replaces the redundant bar chart; the remaining figure shows how the formulas change with the ATE.
+Calculations live in `R/analysis.R`; `R/paper.R` formats their results. There is one writer for each output.
 
 ## Citation
 

@@ -10,7 +10,6 @@
 \usepackage{setspace}
 \setstretch{1.15}
 \usepackage[nameinlink,capitalize,noabbrev]{cleveref}
-\graphicspath{{../figs/}}
 \newcommand{\citeapos}[1]{\citeauthor{#1}'s (\citeyear{#1})}
 \newcommand{\TableStyle}{\normalsize\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1}}
 \newcommand{\tablenote}[1]{\par\smallskip\begin{minipage}{\linewidth}\footnotesize #1\end{minipage}}
@@ -25,7 +24,7 @@
 \maketitle
 
 \begin{abstract}
-\noindent \citet{blair2013poverty} conclude from endorsement experiments that Pakistanis hold militant groups in ``low regard.'' I reanalyze their survey and find that the average endorsement effect is small because reactions offset, not because respondents do not react. Each respondent answers four policy questions, and random assignment makes the control arm's joint distribution of the four answers the counterfactual for the endorsed arm. Under endorsement, answers to five of six policy pairs become more closely related, and respondents whose answers average the midpoint of the scale move away from it in both directions: that share falls by \MidpointDrop{} percentage points. Endorsed arms simulated from control respondents show that opposition alone, tuned to reproduce the average effect, leaves the midpoint share unchanged. The measurement model developed for endorsement experiments \citep{bullock2011statistical} implies a \PrimaryShare{} probability of a positive latent reaction (95\% credible interval \PrimaryInterval{}), but it treats a respondent's reactions as independent across questions, which these patterns contradict. More generally, an average treatment effect does not identify the proportion holding favorable attitudes. Alternative behavioral assumptions yield different implied supporter proportions. The observed response marginals bound the fraction of responses increased by endorsement between \LowerBound{} and \UpperBound{}.
+\noindent \citet{blair2013poverty} find that endorsements by militant groups slightly lower Pakistanis' support for policies and conclude that Pakistanis hold these groups in ``low regard.'' A small average effect is consistent with indifference and with large reactions in both directions that offset. Because each respondent answers four policy questions, the data can distinguish the two. Under endorsement, answers to most pairs of policies become more closely related, and the share of respondents whose answers average the midpoint of the scale falls by \MidpointDrop{} percentage points, with gains on both sides. Simulations built from control respondents show that opposition alone does not produce this pattern. The small average effect reflects offsetting reactions, not indifference. How many respondents react favorably is not identified: the standard measurement model's estimate of \PrimaryShare{} assumes that a respondent's reactions are independent across questions, which the data contradict.
 \end{abstract}
 
 \section{Introduction}
@@ -36,8 +35,6 @@ The small average effect reflects offsetting reactions, not indifference. Becaus
 
 The measurement model of \citet{bullock2011statistical} gives a \PrimaryShare{} probability of a positive latent reaction to an endorsement, averaged equally across the four groups (95\% credible interval \PrimaryInterval{}), with mean reactions no larger than \MaxMeanReaction{} ideal-point standard deviations and larger estimated dispersion. That model treats each reaction as independent across a respondent's questions, and the within-respondent patterns contradict it. The data show that substantial favorable and unfavorable reactions coexist; they do not pin down how many respondents react favorably.
 
-The distinction between an average and a prevalence is general. An average treatment effect (ATE) combines the frequency and size of positive and negative effects. Its sign alone cannot separate them. Under behavioral assumptions linking favorable attitudes to positive effects, the same ATE can imply different supporter proportions. Some such assumptions are contradicted by the observed response distribution. Others produce implications for quantities that should not be equated: an unaffected fraction, a probability of positive latent affect, and a fraction of observed responses increased by an endorsement.
-
 \section{Endorsement Experiments}
 \label{sec:background}
 
@@ -45,7 +42,12 @@ Endorsement experiments randomize whether a policy question includes an endorsem
 
 Interpreting that effect as affect toward the endorser requires more. Respondents must understand the endorsement, and its effect must operate through their attitudes toward the group rather than through other information the cue conveys. Even then, the size of a response change can depend on baseline policy preferences and the response scale. The design has been used to study militant groups in Pakistan and combatants in Afghanistan \citep{bullock2011statistical, blair2013poverty, lyall2013explaining, blair2014comparing}.
 
-A negative ATE can reflect many small negative reactions, a few large ones, or positive and negative reactions that nearly cancel. It therefore does not identify the proportion with either sign of effect. Nor does the sign of an effect, without a measurement assumption, classify a respondent as a supporter or opponent.
+A small negative ATE can reflect many small negative reactions, a few large ones, or positive and negative reactions that nearly cancel. Suppose a proportion $p$ of respondents reacts favorably and the rest unfavorably, with average effects $\delta^+$ and $\delta^-$ on the observed response. Then
+\begin{align}
+\beta=p\delta^+ +(1-p)\delta^-.
+\label{eq:ate_decomposition}
+\end{align}
+One observed mean cannot determine three unknowns \citep{manski1990nonparametric}. Indifference ($\delta^+$ and $\delta^-$ near zero) and offsetting reactions (large $\delta^+$ and $\delta^-$ of opposite sign) can produce the same $\beta$. Nor does the sign of an effect, without a measurement assumption, classify a respondent as a supporter or opponent. Each respondent in this experiment answers several questions, and the way those answers move together separates the two readings (\cref{sec:within}).
 
 \section{The Experiment and Data}
 \label{sec:data}
@@ -56,58 +58,16 @@ A negative ATE can reflect many small negative reactions, a few large ones, or p
 I use the analysis file supplied with the \texttt{endorse} R package \citep{shiraito2022endorse}. It contains \SampleSize{} respondents with one observed answer per policy, yielding \ControlCount{} control responses and \TreatmentCount{} endorsed responses. The pooled control mean is \BaselineMean{}, the treatment mean is \TreatmentMean{}, and their difference is $\PooledATE{}$ (respondent-clustered SE \PooledSE{}). These are response-weighted means across the available policy items and endorsers.
 
 % Original weighting and estimates: Blair et al. (2013), survey design, footnote 31, Table 1.
-The analysis is unweighted. Blair et al. use population and policy weights; their survey oversampled Balochistan and Khyber Pakhtunkhwa. Their unconditional Table 1 has 5,358 respondents and a control mean of 0.796. Differences from the present estimates can reflect sample selection and policy weighting as well as population weighting. The model-based probabilities below therefore describe the fitted analysis sample, not nationally representative prevalence.
+The analysis is unweighted. Blair et al. use population and policy weights; their survey oversampled Balochistan and Khyber Pakhtunkhwa. Their unconditional Table 1 has 5,358 respondents and a control mean of 0.796. Differences from the present estimates can reflect sample selection and policy weighting as well as population weighting. The estimates below therefore describe the analysis sample, not nationally representative prevalence.
 
 The package sample also retains assignment patterns excluded by the original replication code: \MixedCount{} respondents have control and endorsed items across policies, and \RepeatedCount{} receive the same endorser on multiple policies. Excluding these \AnomalyCount{} respondents changes the pooled ATE from $\PooledATEPrecise{}$ to $\CleanATE{}$. This diagnostic leaves the sign and rounded magnitude intact. The Bayesian models retain the package sample; their sensitivity to these exclusions has not been estimated.
-
-\section{Model-Based Positive Latent Reactions}
-\label{sec:model}
-
-The measurement model of \citet{bullock2011statistical} relates ordinal policy responses to latent policy preferences and endorsement reactions. Respondent $i$ has a latent position $x_i$. For question $j$ endorsed by group $k$, the model adds a reaction $s_{ijk}$ and maps the resulting position to an observed category through question-specific loadings and cutpoints. In the baseline specification,
-\begin{align}
-s_{ijk} &\sim \mathcal{N}(\lambda_k,\omega_k^2), &
-P(s_{ijk}>0) &= \Phi(\lambda_k/\omega_k).
-\label{eq:latent_probability}
-\end{align}
-The mean and variance of the reaction distribution are common across policies. The reaction itself is question-specific; the specification does not assign each respondent a single fixed supporter status across all questions. The positive probability is invariant to the units of the latent scale.
-
-A positive latent reaction need not move a response into a higher observed category. The model also includes response noise, so $P(s_{ijk}>0)$ is distinct from the probability that the observed treatment response exceeds the control potential response. Its interpretation as favorable affect depends on the measurement model and the meaning of the endorsement cue. The model also draws each reaction independently across a respondent's questions; \cref{sec:within} shows that the data contradict this, so the estimates below describe the fitted model rather than a validated prevalence.
-
-I fit the baseline model without covariates using \texttt{endorse}.\footnote{The fitting script uses three chains with starting values dispersed across negative, zero, and positive mean reactions. Each chain runs for 200,000 iterations, discards 20,000, and retains every 40th draw. The largest reported Gelman--Rubin statistic across the mean and variance parameters is \MaxRhat{}, and the smallest effective sample size across mean reactions is \MinESS{}. The fits use the package's default priors.}
-% MCMC settings above are fixed inputs in R/model.R, not estimated results.
-\Cref{tab:endorse_results} reports posterior means and credible intervals. Averaged equally over groups, the probability of a positive latent reaction is \PrimaryShare{} (95\% credible interval \PrimaryInterval{}). This is an average of four marginal probabilities, not the probability of favoring at least one group. The Afghan Taliban have the lowest estimate, \AfghanShare{}, and a wide interval, \AfghanInterval{}. Their posterior probability of a negative mean reaction is \AfghanNegativeProbability{}; the other groups' mean-reaction intervals include zero.
-
-\begin{table}[htbp]
-\centering\TableStyle
-\caption{Positive latent reactions under the baseline measurement model}
-\label{tab:endorse_results}
-\begin{adjustbox}{max width=\linewidth}
-\input{../tabs/endorse_results.tex}
-\end{adjustbox}
-\tablenote{Unweighted analysis sample, $n=\SampleSize$. CrI denotes a 95\% credible interval. Mean reaction and reaction SD are posterior means in ideal-point SD units. The average row weights the four endorsers equally.}
-\end{table}
-
-% Subgroup comparisons: Blair et al. (2013), Table 2; geography: Bullock et al. (2011), empirical application.
-Other analyses of this survey also describe heterogeneity. Blair et al.'s middle-income treatment effects range from $-0.006$ to $0.001$ across specifications, while low-income effects range from $-0.026$ to $-0.019$ on the rescaled outcome. Bullock et al. estimate geographic variation in latent affect, with positive estimates in parts of Punjab and negative estimates in Balochistan and NWFP.
-
-Adding gender, rurality, education, and income covariates raises the average positive probability to \CovariateShare{}; a model with division-level means raises it to \HierarchicalShare{} (\cref{tab:endorse_robustness}). The increase is in the average, not every group-specific estimate. The Afghan Taliban estimate rises to \HierarchicalAfghanShare{} under the hierarchical specification. The covariate and hierarchical summaries average over the sample's covariates and division frequencies, respectively.
-
-\begin{table}[htbp]
-\centering\TableStyle
-\caption{Positive latent reactions across measurement-model specifications}
-\label{tab:endorse_robustness}
-\begin{adjustbox}{max width=\linewidth}
-\input{../tabs/endorse_robustness.tex}
-\end{adjustbox}
-\tablenote{Posterior means with 95\% credible intervals in brackets. All specifications use the unweighted package sample. Baseline reactions have common group means; covariate means depend on individual characteristics; hierarchical means vary by division. The average row weights endorsers equally.}
-\end{table}
 
 \section{Within-Respondent Patterns}
 \label{sec:within}
 
-Each respondent answers all four policy questions. Endorsed respondents receive a different group on each question; control respondents receive none. Random assignment therefore gives the control arm's joint distribution of the four answers as the counterfactual for the endorsed arm. Two features of that joint distribution bear on the measurement model: how a respondent's answers move together across policies, and the distribution of each respondent's mean answer. Neither requires a model. The \MixedCount{} respondents with both control and endorsed items are excluded from this section; intervals are percentile bootstrap intervals over respondents.
+Each respondent answers all four policy questions. Endorsed respondents receive a different group on each question; control respondents receive none. Random assignment therefore gives the control arm's joint distribution of the four answers as the counterfactual for the endorsed arm. Two features of that joint distribution show whether respondents react: how a respondent's answers move together across policies, and the distribution of each respondent's mean answer. Neither requires a model. The \MixedCount{} respondents with both control and endorsed items are excluded from this section; intervals are percentile bootstrap intervals over respondents.
 
-In the measurement model, reactions are independent across questions for the same respondent, so the correlation between any two policy answers is the same with and without an endorsement, apart from the effect of the mean shift on the discrete scale. \Cref{tab:within_correlation} shows that the correlations change, and not in one direction. The two policies whose answers are most strongly related in the control arm, Frontier Crimes Regulation reform and the Durand Line, become less related under endorsement: the correlation falls from \StrongPairControl{} to \StrongPairEndorsed{} (\StrongPairChange{}, 95\% interval \StrongPairInterval{}). Every other pair becomes more related, by \WeakPairChangeMin{} to \WeakPairChangeMax{}, with every interval excluding zero. A reaction that each respondent carries across all four endorsements raises every pairwise correlation; a cue that also loosens the link between an answer and the respondent's policy position lowers the correlation for the pair most tightly linked to that position. The pattern is consistent with both operating together. It is not consistent with reactions that are independent across questions, and it is not consistent with reactions that enter each question in proportion to that question's loading on the latent position, which would raise the FCR--Durand correlation most.
+If reactions are independent across a respondent's questions, as in the standard measurement model \citep{bullock2011statistical}, the correlation between any two policy answers is the same with and without an endorsement, apart from the effect of the mean shift on the discrete scale. \Cref{tab:within_correlation} shows that the correlations change, and not in one direction. The two policies whose answers are most strongly related in the control arm, Frontier Crimes Regulation reform and the Durand Line, become less related under endorsement: the correlation falls from \StrongPairControl{} to \StrongPairEndorsed{} (\StrongPairChange{}, 95\% interval \StrongPairInterval{}). Every other pair becomes more related, by \WeakPairChangeMin{} to \WeakPairChangeMax{}, with every interval excluding zero. A reaction that each respondent carries across all four endorsements raises every pairwise correlation; a cue that also loosens the link between an answer and the respondent's policy position lowers the correlation for the pair most tightly linked to that position. The pattern is consistent with both operating together. It is not consistent with reactions that are independent across questions, and it is not consistent with reactions that enter each question in proportion to that question's loading on the latent position, which would raise the FCR--Durand correlation most.
 
 \begin{table}[htbp]
 \centering\TableStyle
@@ -147,133 +107,56 @@ This comparison holds the counterfactual fixed at the observed control arm and v
 
 These patterns do not identify a proportion of favorable reactions. They establish that endorsements produce reactions that respondents carry across questions, that those reactions are large relative to the average effect, and that where movement in both directions is observable it occurs in both directions. The small average effect reflects opposing reactions that offset, not an absence of reactions.
 
-\section{Behavioral Assumptions and Supporter Proportions}
-\label{sec:framework}
+\section{How Many React Favorably?}
+\label{sec:model}
 
-The measurement model estimates a latent distribution under parametric assumptions. A simpler decomposition shows why the ATE alone cannot identify a supporter proportion. Suppose a proportion $p$ holds favorable attitudes and the remainder holds unfavorable attitudes. Let $\delta^+$ and $\delta^-$ be their average effects on the observed response. Then
+The within-respondent patterns show that favorable and unfavorable reactions coexist. They do not say how many respondents react favorably. Each route to that number rests on assumptions the data do not support or cannot check.
+
+\subsection{The Measurement Model}
+
+The measurement model of \citet{bullock2011statistical} relates ordinal policy responses to latent policy preferences and endorsement reactions. Respondent $i$ has a latent position $x_i$. For question $j$ endorsed by group $k$, the model adds a reaction $s_{ijk}$ and maps the resulting position to an observed category through question-specific loadings and cutpoints. In the baseline specification,
 \begin{align}
-\beta=p\delta^+ +(1-p)\delta^-.
-\label{eq:ate_decomposition}
+s_{ijk} &\sim \mathcal{N}(\lambda_k,\omega_k^2), &
+P(s_{ijk}>0) &= \Phi(\lambda_k/\omega_k).
+\label{eq:latent_probability}
 \end{align}
-Interpreting the two classes as supporters and opponents requires behavioral assumptions, such as $\delta^+>0$ and $\delta^-<0$. One observed mean effect cannot determine the three unknowns. This is a partial-identification problem \citep{manski1990nonparametric}. The control mean $\alpha$ supplies information about baseline responses, but does not resolve the decomposition without restrictions on how baseline preferences relate to attitudes and effects.
+The mean and variance of the reaction distribution are common across policies. The reaction itself is question-specific; the specification does not assign each respondent a single fixed supporter status across all questions. The positive probability is invariant to the units of the latent scale.
 
-\subsection{Binary Switching and Baseline Information}
+A positive latent reaction need not move a response into a higher observed category. The model also includes response noise, so $P(s_{ijk}>0)$ is distinct from the probability that the observed treatment response exceeds the control potential response. Each reaction is drawn independently across a respondent's questions. That is the assumption \cref{sec:within} rejects: under it, the correlations between policy answers would not change.
 
-Suppose every supporter ends at 1 and every opponent at 0 under treatment. Then the treatment mean directly identifies $p$:
-\begin{align}
-p=E[Y(1)]=\alpha+\beta.
-\label{eq:binary_switching}
-\end{align}
-This endpoint restriction identifies $p$ without separately identifying both class-specific baseline means. Applied to the pooled data it gives \BinaryShare{}. But the restriction also predicts treatment variance $p(1-p)$ and excludes all interior responses. The observed interior categories contradict this model.
-
-The baseline still matters. Reporting $\alpha$ and $\beta$ reveals both treatment and control means, whereas reporting only $\beta$ discards information about the scale's available room for movement. The control mean of \BaselineMean{} is a mean intensity, not a supporter fraction. For comparison, \TopTwoShare{} of control responses occupy the top two categories.
-
-Partial awareness requires another assumption. If a fraction $q$ has an opinion and follows binary switching, while the rest is unaffected with baseline mean $a_U$, then
-\begin{align}
-p_{\mathrm{aware}}=\frac{\alpha+\beta-(1-q)a_U}{q}.
-\end{align}
-The expression $\alpha+\beta/q$ follows only if the unaffected subgroup has baseline mean $\alpha$. With $q=0.7$ as an illustrative assumption, allowing feasible subgroup means gives a range from \AwareLower{} to 100\%, rather than a unique estimate near the full-sample treatment mean. This calculation remains conditional on binary switching among opinion-holders.
-
-\subsection{Alternative Moment Restrictions}
-
-To illustrate sensitivity to assumptions, I hold the pooled ATE fixed and vary the restrictions on endorsement effects.
-
-\textbf{Symmetric class-average effects.} If $\delta^+=d$ and $\delta^-=-d$, then
-\begin{align}
-p=\frac{\beta}{2d}+\frac{1}{2}, \qquad |\beta|\leq d.
-\end{align}
-Using the pooled ATE, $d=0.05$ implies \SymmetricShare{}, whereas $d=0.02$ implies \SmallSymmetricShare{}. These choices constrain class-average effects; they do not require every individual to move by a noninteger number of response categories. Neither value of $d$ is identified by the pooled ATE and baseline alone.
-
-\textbf{Extreme opponent reactions.} If opponents move from 1 to 0 and everyone else is unaffected, then $\beta=-(1-p)$, so $p=1+\beta$, or \ExtremeShare{}. Here $p$ is the unaffected fraction. Calling it a supporter fraction requires an additional classification assumption; the calculation supplies no positive reactions. The restriction also implies $\beta\leq0$ and specific changes in the endpoint masses.
-
-\textbf{A continuous normal approximation.} If one approximates individual effects by $\delta_i\sim\mathcal{N}(\beta,\sigma^2)$, then $P(\delta_i>0)=\Phi(\beta/\sigma)$. Setting $\sigma=0.05$ gives \NormalShare{}. An exact normal distribution is incompatible with differences on a bounded five-point scale. This calculation is a continuous approximation, not a fitted ordinal model. It differs from \cref{eq:latent_probability}, where normality applies to a latent reaction rather than an observed response difference.
-
-\section{Observed Distributions, Bounds, and Sensitivity}
-\label{sec:application}
-
-\subsection{Endpoint Restrictions and Response Variation}
-
-\Cref{tab:empirical_support} applies the moment calculations separately by endorser. Each ATE compares the group's pooled endorsed responses with the pooled control responses. The Afghan Taliban have the most negative difference and the lowest implied fraction under each formula. Each formula is an increasing function of the ATE, so the group ordering is the same under all of them.
+I fit the baseline model without covariates using \texttt{endorse}.\footnote{The fitting script uses three chains with starting values dispersed across negative, zero, and positive mean reactions. Each chain runs for 200,000 iterations, discards 20,000, and retains every 40th draw. The largest reported Gelman--Rubin statistic across the mean and variance parameters is \MaxRhat{}, and the smallest effective sample size across mean reactions is \MinESS{}. The fits use the package's default priors.}
+% MCMC settings above are fixed inputs in R/model.R, not estimated results.
+\Cref{tab:endorse_results} reports posterior means and credible intervals. Averaged equally over groups, the probability of a positive latent reaction is \PrimaryShare{} (95\% credible interval \PrimaryInterval{}). This is an average of four marginal probabilities, not the probability of favoring at least one group. The Afghan Taliban have the lowest estimate, \AfghanShare{}, and a wide interval, \AfghanInterval{}. Their posterior probability of a negative mean reaction is \AfghanNegativeProbability{}; the other groups' mean-reaction intervals include zero.
 
 \begin{table}[htbp]
 \centering\TableStyle
-\caption{Moment-based implications by endorser}
-\label{tab:empirical_support}
+\caption{Positive latent reactions under the baseline measurement model}
+\label{tab:endorse_results}
 \begin{adjustbox}{max width=\linewidth}
-\input{../tabs/empirical_support.tex}
+\input{../tabs/endorse_results.tex}
 \end{adjustbox}
-\tablenote{ATEs are differences on the 0--1 response scale in the unweighted sample. Binary denotes the endpoint model; symmetric uses $d=0.05$; normal uses the continuous approximation with $\sigma=0.05$; extreme denotes the unaffected fraction under maximal opponent reactions.}
+\tablenote{Unweighted analysis sample, $n=\SampleSize$. CrI denotes a 95\% credible interval. Mean reaction and reaction SD are posterior means in ideal-point SD units. The average row weights the four endorsers equally.}
 \end{table}
 
-Binary switching predicts a pooled treatment SD of \BinarySD{}, compared with the observed \TreatmentSD{}. Across policy--endorser cells, the average observed variance divided by the average predicted variance is \VarianceRatio{} (\cref{tab:variance_test}). Interior responses directly violate the endpoint restriction; the variance comparison summarizes the discrepancy. Given a treatment mean $m$ and variance $v$, the diagnostic is $v/[m(1-m)]$.
+Adding gender, rurality, education, and income covariates gives an average of \CovariateShare{}, and a model with division-level means gives \HierarchicalShare{}. These specifications share the independence assumption.
+
+\subsection{Bounds and Restrictions}
+
+Without a model, the experiment identifies the treatment and control distributions of each answer but not how they pair within a person. Allowing every pairing of the pooled distributions bounds the fraction of person--policy responses that an endorsement raises between \LowerBound{} and \UpperBound{}. The bounds are too wide to settle the question.
+
+Fixing the sizes of favorable and unfavorable effects in \cref{eq:ate_decomposition} turns the ATE into a share. \Cref{tab:method_comparison} collects several such restrictions. The implied shares run from \SmallSymmetricShare{} to \ExtremeShare{}, and the data contradict some of them: binary switching, for example, allows no interior responses. The response ceiling widens the range. In the control arm \CeilingShare{} of responses are at the top of the scale, where a favorable reaction cannot show. If favorable and unfavorable respondents both move one category, truncation at the top implies a favorable share of \DiscreteOneShare{} despite a negative mean.
 
 \begin{table}[htbp]
 \centering\TableStyle
-\caption{Observed variance versus the binary-switching prediction}
-\label{tab:variance_test}
-\begin{adjustbox}{max width=\linewidth}
-\input{../tabs/variance_test.tex}
-\end{adjustbox}
-\tablenote{Treatment responses are rescaled to 0--1. Predicted variance is $m(1-m)$ for each cell's treatment mean $m$; observed variance uses the sample variance. The final ratio divides the two column averages. Interior response categories contradict the endpoint model.}
-\end{table}
-
-\subsection{Ceiling Effects on the Discrete Scale}
-
-The response ceiling can attenuate upward movement. In the control group, \CeilingShare{} of responses are at 1. A respondent at that endpoint cannot report greater policy support, although a respondent with an unfavorable reaction can move down. This is a measurement constraint, not bias in an ATE defined on the observed response scale.
-
-For an illustration, suppose supporters and opponents share the observed control distribution, and each moves up or down by the same number of categories, subject to the endpoints. Let $\bar\delta^+$ and $\bar\delta^-$ denote the resulting average shifts. Solving \cref{eq:ate_decomposition} gives \DiscreteOneShare{} for a one-category shift, \DiscreteTwoShare{} for two, and \DiscreteThreeShare{} for three (\cref{tab:discrete_scale}). The baseline distribution within attitude classes is unobserved; compatibility of the resulting treatment distribution with the data would require a separate check. The calculations show how truncation can produce a negative mean despite a majority assigned to the favorable class.
-
-\begin{table}[htbp]
-\centering\TableStyle
-\caption{Fixed category shifts with truncation at the scale endpoints}
-\label{tab:discrete_scale}
-\begin{adjustbox}{max width=\linewidth}
-\input{../tabs/discrete_scale.tex}
-\end{adjustbox}
-\tablenote{Both attitude classes are assigned the pooled control response distribution. Effects and ceiling loss are in 0--1 scale units; ceiling loss is the nominal upward shift minus its truncated average. Implied $p$ matches the pooled ATE under each restriction.}
-\end{table}
-
-\subsection{Comparing the Illustrations}
-
-\Cref{tab:method_comparison} collects the moment implications. The range from \SmallSymmetricShare{} to \ExtremeShare{} demonstrates how different restrictions and definitions can produce different answers from the same means. It is not a confidence interval, an identification region, or evidence that the data fit every restriction.
-
-\begin{table}[htbp]
-\centering\TableStyle
-\caption{Illustrative implications of the pooled outcome means}
+\caption{Favorable shares implied by restrictions on effect sizes}
 \label{tab:method_comparison}
 \begin{adjustbox}{max width=\linewidth}
 \input{../tabs/method_comparison.tex}
 \end{adjustbox}
-\tablenote{All rows use the unweighted pooled ATE $\PooledATE{}$ and, where required, control mean \BaselineMean{}. Fractions refer to the class defined by each restriction. Binary switching is contradicted by the observed interior categories. The normal row is a continuous approximation; the extreme row is an unaffected fraction. No sampling intervals are shown.}
+\tablenote{All rows use the unweighted pooled ATE $\PooledATE{}$ and, where required, control mean \BaselineMean{}. Fractions refer to the class defined by each restriction. Binary switching is contradicted by the observed interior categories. The normal row is a continuous approximation to individual effects on the observed scale; the extreme row is an unaffected fraction. Category shifts assign both classes the pooled control distribution and truncate at the scale endpoints.}
 \end{table}
 
-
-\Cref{fig:sensitivity} varies the ATE while holding each restriction fixed. Lines stop where the implied fraction would leave $[0,1]$. For example, symmetric effects with magnitude $d$ require $|\beta|\leq d$; positive ATEs are incompatible with the extreme-opponent restriction.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.95\textwidth]{sensitivity.pdf}
-\caption{Sensitivity of moment implications to the ATE on the 0--1 scale. The baseline mean for binary switching is held at \BaselineMean{}. Curves omit infeasible probabilities; they do not flatten at zero or one. The vertical line marks the unweighted pooled ATE, and the horizontal line marks one half. The asterisk identifies the contradicted endpoint restriction. Curves describe deterministic formulas, not sampling uncertainty.}
-\label{fig:sensitivity}
-\end{figure}
-
-\subsection{Bounds on Observed Response Increases}
-
-A different calculation bounds observed response changes without specifying a latent reaction distribution. Under valid randomization, observation, and consistency assumptions, the experiment identifies treatment and control marginal outcome distributions, but not their joint distribution. Allowing every coupling of the estimated pooled marginals gives bounds of \LowerBound{} to \UpperBound{} on the fraction of person--policy responses for which $Y(1)>Y(0)$ (\cref{tab:pairing_bounds}). These are plug-in bounds conditional on the empirical marginals, not confidence limits. Pooling also discards policy-specific restrictions on the joint distribution.
-
-Independent random pairing yields a higher treatment response \RandomHigher{} of the time, a lower one \RandomLower{}, and a tie \RandomEqual{}. Independence is an additional assumption about the coupling, not a feature identified by the experiment. The bounds permit either a minority or a majority of observed responses to increase. They do not bound the fraction holding favorable attitudes or the latent probability in \cref{sec:model}.
-
-\begin{table}[htbp]
-\centering\TableStyle
-\caption{Random pairing and bounds on observed response increases}
-\label{tab:pairing_bounds}
-\begin{adjustbox}{max width=\linewidth}
-\input{../tabs/pairing_bounds.tex}
-\end{adjustbox}
-\tablenote{$T$ and $C$ denote treatment and control responses on the five-point scale. The first three columns pair them independently; the last two optimize $P(T>C)$ over all couplings of the empirical pooled marginals. The unit is a person--policy response. Bounds omit sampling uncertainty and do not measure positive latent affect.}
-\end{table}
-
-\subsection{Comparison with Direct Polling}
+\subsection{Direct Polling}
 
 % Polling percentages: Pew Research Center (2012), Chapter 2 and topline, Afghan Taliban.
 Pew's 2012 survey reports 14\% favorable views of the Afghan Taliban, 45\% unfavorable views, and 41\% with no opinion \citep{pew2012attitudes}. If stated opinions are classified correctly, assigning all nonrespondents to the favorable category gives an upper bound of 55\%. That bound does not allow respondents who report unfavorable opinions to conceal favorable ones.
@@ -283,11 +166,9 @@ The corresponding Afghan Taliban estimate from the 2009 endorsement data is \Afg
 \section{Discussion}
 \label{sec:discussion}
 
-Researchers should distinguish the average effect on an observed response, the fraction of responses with positive effects, and the prevalence of favorable attitudes. Random assignment identifies the first under the usual design assumptions. Marginal response distributions can bound the second. Estimating the third requires a model connecting responses to attitudes, and its credibility depends on that connection.
+The average effect of an endorsement, the fraction of responses it raises, and the prevalence of favorable attitudes are different quantities. Random assignment identifies the first. The response distributions bound the second. The third requires a model connecting responses to attitudes, and that model can be checked against how a respondent's answers move together. The standard measurement model fails that check.
 
-Reporting treatment and control distributions alongside the ATE makes such assumptions easier to assess. Endpoint restrictions can be checked against interior responses; ceiling constraints are visible in the baseline distribution. Model-based positive probabilities should be reported with credible intervals, the population over which they are averaged, and evidence about model fit and sensitivity to priors.
-
-The within-respondent patterns in \cref{sec:within} are the first such check this paper applies, and the baseline measurement model does not pass it: the model implies unchanged correlations across policy answers, and the data show correlations that rise for most pairs and fall for one. A model in which a reaction shifts a respondent's answers directly, rather than through the latent position, is the natural alternative. Latent-class versions of that model, with opponents, unaffected respondents, and supporters, did not identify the favorable share in these data: the estimate depended on how the response ceiling was modelled, the sizes of favorable and unfavorable shifts could not be separated, and simulated data with no supporters returned a positive share. The replication materials document these attempts. The present reanalysis also leaves open population adjustment, Bayesian sensitivity to the assignment exclusions, prior sensitivity, and posterior predictive fit of the baseline model. Endorsement credibility is another measurement question. If respondents disbelieve a cue or infer information beyond the endorser's identity, the mapping to attitudes can change; the direction of that change is not established by the ATE alone.
+A model in which a reaction shifts a respondent's answers directly, rather than through the latent position, is the natural alternative. Latent-class versions of that model, with opponents, unaffected respondents, and supporters, did not identify the favorable share in these data: the estimate depended on how the response ceiling was modelled, the sizes of favorable and unfavorable shifts could not be separated, and simulated data with no supporters returned a positive share. The replication materials document these attempts. Population weighting and sensitivity to the assignment exclusions remain open.
 
 Three changes to the design would identify more. Randomizing whether the group is said to support or oppose the policy separates reactions to the group from a general push away from the middle of the scale: a respondent who favors the group should move in opposite directions under the two cues, and a respondent pushed toward their own view should not. An endorsement by a neutral or widely liked actor measures how much any cue disperses answers. Policies with intermediate baseline support, or a finer response scale, leave room for favorable reactions to appear; here \CeilingShare{} of control responses are already at the top. Asking the policy questions without an endorsement in an earlier wave would go further, by observing each respondent's own shift and so the sizes of favorable and unfavorable reactions separately. Repeated-measures designs in survey experiments have generally not altered treatment effects \citep{clifford2021increasing}, although consistency pressure across waves would need to be checked.
 

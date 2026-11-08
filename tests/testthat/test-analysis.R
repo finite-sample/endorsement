@@ -4,10 +4,6 @@ test_that("moment restrictions leave infeasible fractions undefined", {
   expect_true(is.na(binary_switching(0.74, 0.3)))
   expect_true(is.na(discrete_scale(0.1, c(0, 0, 0, 0, 1), 1)$fraction))
   expect_error(symmetric_effects(0, 0), "positive")
-  curves <- sensitivity_data(0.74)
-  symmetric <- curves[curves$restriction == "Symmetric effects (d = 0.02)", ]
-  expect_true(all(is.na(symmetric$fraction[abs(symmetric$ate) > 0.02])))
-  expect_equal(range(symmetric$fraction, na.rm = TRUE), c(0, 1))
 })
 
 test_that("strict-increase bounds handle ties and point masses", {
@@ -58,7 +54,7 @@ test_that("empirical results survive the language migration", {
   expect_equal(analysis$alpha, 0.735850833411809, tolerance = 1e-12)
   expect_equal(analysis$beta, -0.012832943099950533, tolerance = 1e-12)
   expect_equal(analysis$se, 0.00520879916129222, tolerance = 1e-12)
-  expect_equal(unname(analysis$bounds["All groups", c("lower", "upper")]),
+  expect_equal(unname(analysis$bounds[c("lower", "upper")]),
     c(0.011908176659755743, 0.5804689707128732),
     tolerance = 1e-12
   )

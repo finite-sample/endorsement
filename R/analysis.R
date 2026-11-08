@@ -133,8 +133,10 @@ reaction_worlds <- function(responses, draws = 2000L, simulations = 500L, seed =
   step <- 0.25
   statistic <- function(values) {
     sixteenths <- round(rowMeans(values) * 16)
-    c(spread = stats::var(rowMeans(values)), midpoint = mean(sixteenths == 8),
-      below = mean(sixteenths == 7), above = mean(sixteenths == 9))
+    c(
+      spread = stats::var(rowMeans(values)), midpoint = mean(sixteenths == 8),
+      below = mean(sixteenths == 7), above = mean(sixteenths == 9)
+    )
   }
   observed <- arm_bootstrap(matrix, statistic, draws, seed)
   ate <- mean(matrix$values[matrix$treated, ]) - mean(control)
@@ -187,20 +189,6 @@ analyze_responses <- function(respondents, posteriors) {
   alpha <- mean(control)
   beta <- mean(treated) - alpha
   control_distribution <- category_distribution(control)
-  groups <- lapply(setNames(names(endorsers), unname(endorsers)), function(code) {
-    responses$response[responses$endorser == code]
-  })
-  cells <- do.call(rbind, lapply(policies, function(policy) {
-    baseline <- responses$response[responses$policy == policy & responses$endorser == "a"]
-    do.call(rbind, lapply(names(endorsers), function(code) {
-      endorsed <- responses$response[responses$policy == policy & responses$endorser == code]
-      data.frame(policy,
-        endorser = endorsers[[code]],
-        alpha = mean(baseline), beta = mean(endorsed) - mean(baseline),
-        variance_observed = var(endorsed), variance_predicted = mean(endorsed) * (1 - mean(endorsed))
-      )
-    }))
-  }))
   discrete <- do.call(rbind, lapply(1:3, function(steps) discrete_scale(beta, control_distribution, steps)))
   methods <- data.frame(
     restriction = c(
@@ -219,17 +207,7 @@ analyze_responses <- function(respondents, posteriors) {
       normal_heterogeneity(beta, 0.05), symmetric_effects(beta, 0.05), symmetric_effects(beta, 0.02)
     )
   )
-  group_effects <- do.call(rbind, lapply(names(groups), function(group) {
-    effect <- mean(groups[[group]]) - alpha
-    data.frame(
-      endorser = group, ate = effect, binary = binary_switching(alpha, effect),
-      symmetric = symmetric_effects(effect, 0.05), normal = normal_heterogeneity(effect, 0.05),
-      extreme = extreme_opponent(effect)
-    )
-  }))
-  bounds <- do.call(rbind, lapply(c(groups, list("All groups" = treated)), function(values) {
-    pairing_bounds(category_distribution(values), control_distribution)
-  }))
+  bounds <- pairing_bounds(category_distribution(treated), control_distribution)
   anomalies <- assignment_anomalies(respondents)
   excluded <- which(anomalies$mixed | anomalies$repeated)
   restricted <- responses[!responses$respondent %in% excluded, ]
@@ -238,8 +216,7 @@ analyze_responses <- function(respondents, posteriors) {
   list(
     respondents = nrow(respondents), responses = responses, control = control, treated = treated,
     alpha = alpha, beta = beta, se = clustered_ate_se(responses), control_distribution = control_distribution,
-    cells = cells, discrete = discrete, methods = methods, group_effects = group_effects, bounds = bounds,
-    variance_ratio = mean(cells$variance_observed) / mean(cells$variance_predicted),
+    discrete = discrete, methods = methods, bounds = bounds,
     anomalies = colSums(anomalies), excluded = length(excluded), clean_ate = clean_ate, posteriors = posteriors,
     moments = within_respondent_moments(responses), person_means = person_mean_distribution(responses),
     reaction_worlds = reaction_worlds(responses)
