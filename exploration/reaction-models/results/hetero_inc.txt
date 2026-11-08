@@ -1,0 +1,110 @@
+fit_stan.py:27: FutureWarning: DataFrameGroupBy.apply operated on the grouping columns. This behavior is deprecated, and in a future version of pandas the grouping columns will be excluded from the operation. Either pass `include_groups=False` to exclude the groupings or explicitly select the grouping columns after groupby to silence this warning.
+  cells = long.groupby(["item", "group", "cell_inc"], sort=False).apply(lambda d: (d.index.min() + 1, d.index.max() + 1))
+17:17:53 - cmdstanpy - INFO - compiling stan file endorse_shared_v.stan to exe file endorse_shared_v
+17:18:01 - cmdstanpy - INFO - compiled model executable: endorse_shared_v
+17:18:01 - cmdstanpy - INFO - created output directory: fit_hetero_inc
+17:18:01 - cmdstanpy - INFO - CmdStan start processing
+17:18:01 - cmdstanpy - INFO - Chain [1] start processing
+17:18:01 - cmdstanpy - INFO - Chain [2] start processing
+17:18:01 - cmdstanpy - INFO - Chain [3] start processing
+17:18:01 - cmdstanpy - INFO - Chain [4] start processing
+17:31:27 - cmdstanpy - INFO - Chain [4] done processing
+17:31:53 - cmdstanpy - INFO - Chain [2] done processing
+17:32:11 - cmdstanpy - INFO - Chain [3] done processing
+17:34:57 - cmdstanpy - INFO - Chain [1] done processing
+17:34:57 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -3153.19, but should be greater than the previous element, -3153.19 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -3155.23, but should be greater than the previous element, -3155.23 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -789.607, but should be greater than the previous element, -789.607 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -197.313, but should be greater than the previous element, -197.313 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 4 is -48.8855, but should be greater than the previous element, -48.8855 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -58.2866, but should be greater than the previous element, -58.2866 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -15.7132, but should be greater than the previous element, -15.7132 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -507030, but should be greater than the previous element, -507030 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -14483.1, but should be greater than the previous element, -14483.1 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -140.789, but should be greater than the previous element, -140.789 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -15895.7, but should be greater than the previous element, -15895.7 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -15897.5, but should be greater than the previous element, -15897.5 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -3973.16, but should be greater than the previous element, -3973.16 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -992.857, but should be greater than the previous element, -992.857 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -247.55, but should be greater than the previous element, -247.55 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -61.187, but should be greater than the previous element, -61.187 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 3 is -12.7436, but should be greater than the previous element, -12.7436 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -1.66227e+06, but should be greater than the previous element, -1.66227e+06 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -47470.4, but should be greater than the previous element, -47470.4 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -461.307, but should be greater than the previous element, -461.307 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -7858.34, but should be greater than the previous element, -7858.34 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -7858.45, but should be greater than the previous element, -7858.45 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -1965, but should be greater than the previous element, -1965 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -491.911, but should be greater than the previous element, -491.911 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 3 is -123.432, but should be greater than the previous element, -123.432 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 4 is -30.4929, but should be greater than the previous element, -30.4929 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 4 is -8.99027, but should be greater than the previous element, -8.99027 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -612134, but should be greater than the previous element, -612134 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -17484.1, but should be greater than the previous element, -17484.1 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 3 is -170.362, but should be greater than the previous element, -170.362 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -10835, but should be greater than the previous element, -10835 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -10835.6, but should be greater than the previous element, -10835.6 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -2708.75, but should be greater than the previous element, -2708.75 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -677.324, but should be greater than the previous element, -677.324 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -169.17, but should be greater than the previous element, -169.17 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -42.0925, but should be greater than the previous element, -42.0925 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -10.3662, but should be greater than the previous element, -10.3662 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -888072, but should be greater than the previous element, -888072 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -25363.8, but should be greater than the previous element, -25363.8 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -246.635, but should be greater than the previous element, -246.635 (in 'endorse_shared_v.stan', line 62, column 6 to column 88)
+Consider re-running with show_console=True if the above output is unclear!
+17:34:59 - cmdstanpy - WARNING - Some chains may have failed to converge.
+	Chain 4 had 60 divergent transitions (6.0%)
+	Use the "diagnose()" method on the CmdStanMCMC object to see further information.
+               Mean     5%    95%  R_hat  ESS_bulk
+beta[1]       0.213  0.182  0.245  1.001  3561.540
+beta[2]       1.480  1.317  1.676  1.010   216.988
+beta[3]       1.251  1.126  1.388  1.010   243.791
+beta[4]       0.384  0.349  0.418  1.001  2450.730
+lambda[1,1]  -0.162 -0.298 -0.026  1.003  1601.720
+lambda[1,2]  -0.032 -0.124  0.058  1.005  1780.570
+lambda[1,3]   0.082 -0.073  0.238  1.001  1106.810
+lambda[2,1]  -0.153 -0.289 -0.017  1.002  1579.880
+lambda[2,2]  -0.067 -0.159  0.024  1.006  1362.940
+lambda[2,3]  -0.048 -0.205  0.113  1.001  1068.120
+lambda[3,1]  -0.129 -0.269  0.011  1.002  1512.460
+lambda[3,2]  -0.035 -0.124  0.059  1.006  1250.470
+lambda[3,3]   0.016 -0.141  0.172  1.001  1124.970
+lambda[4,1]   0.019 -0.117  0.158  1.002  1593.710
+lambda[4,2]  -0.068 -0.163  0.024  1.008  1515.960
+lambda[4,3]   0.048 -0.107  0.203  1.002  1146.350
+omega_eta[1]  0.397  0.074  0.658  1.050    52.993
+omega_eta[2]  0.153  0.011  0.350  1.056    72.690
+omega_eta[3]  0.114  0.009  0.284  1.012   252.467
+s_k[1]        0.987  0.943  1.033  1.002  2896.570
+s_k[2]        1.009  0.963  1.057  1.000  3307.460
+s_k[3]        1.058  1.009  1.110  1.000  2599.700
+s_k[4]        1.014  0.968  1.063  1.002  2325.590
+mu_x[1]       0.237  0.147  0.332  1.003  1294.840
+mu_x[2]       0.000  0.000  0.000    NaN       NaN
+mu_x[3]       0.027 -0.080  0.134  1.002   975.936
+sd_x[1]       1.023  0.941  1.108  1.015   212.129
+sd_x[2]       1.000  1.000  1.000    NaN       NaN
+sd_x[3]       1.288  1.205  1.372  1.006   846.694
+Checking sampler transitions treedepth.
+Treedepth satisfactory for all transitions.
+
+Checking sampler transitions for divergences.
+60 of 4000 (1.50%) transitions ended with a divergence.
+These divergent transitions indicate that HMC is not fully able to explore the posterior distribution.
+Try increasing adapt delta closer to 1.
+If this doesn't remove all divergences, try to reparameterize the model.
+
+Checking E-BFMI - sampler transitions HMC potential energy.
+E-BFMI satisfactory.
+
+Rank-normalized split effective sample size satisfactory for all parameters.
+
+The following parameters had rank-normalized split R-hat greater than 1.01:
+  omega_eta[1], omega_eta[2]
+Such high values indicate incomplete mixing and biased estimation.
+You should consider regularizing your model with additional prior information or a more effective parameterization.
+
+Processing complete.
+

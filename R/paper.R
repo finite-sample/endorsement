@@ -53,6 +53,40 @@ write_tables <- function(analysis) {
     ),
     cbind(rownames(bounds), matrix(percent(bounds), nrow = nrow(bounds))), "lrrrrr", 5L
   )
+  moments <- analysis$moments
+  write_table(
+    "within_correlation", c("Policy pair", "Control", "Endorsed", "Difference", "95\\% interval"),
+    cbind(
+      paste(moments$first, moments$second, sep = " -- "), number(moments$control, 2), number(moments$treated, 2),
+      sprintf("$%+.2f$", moments$difference), sprintf("[$%+.2f$, $%+.2f$]", moments$lower, moments$upper)
+    ), "lrrrr"
+  )
+  bins <- analysis$person_means$bins
+  points <- function(value) sprintf("$%+.1f$", 100 * value)
+  write_table(
+    "person_means", c("Mean answer", "Control", "Endorsed", "Difference (pp)", "95\\% interval"),
+    cbind(
+      bins$bin, percent(bins$control, 1), percent(bins$treated, 1), points(bins$difference),
+      paste0("[", points(bins$lower), ", ", points(bins$upper), "]")
+    ), "lrrrr"
+  )
+  worlds <- analysis$reaction_worlds
+  cell <- function(name, scale, digits) {
+    form <- function(value) sprintf(paste0("$%+.", digits, "f$"), scale * value)
+    bounds <- paste0(form(worlds[[paste0(name, "_lower")]]), ", ", form(worlds[[paste0(name, "_upper")]]))
+    paste0(form(worlds[[name]]), " [", bounds, "]")
+  }
+  share <- function(value) ifelse(is.na(value), "", percent(value))
+  write_table(
+    "reaction_worlds", c(
+      "Endorsed arm", "Oppose", "Favor", "Answers moved", "Spread ($\\times 100$)", "Midpoint (pp)",
+      "One below (pp)", "One above (pp)"
+    ),
+    cbind(
+      worlds$world, share(worlds$oppose), share(worlds$favour), share(worlds$moved),
+      cell("spread", 100, 2), cell("midpoint", 100, 1), cell("below", 100, 1), cell("above", 100, 1)
+    ), "lrrrrrrr", c(2L, 5L)
+  )
   primary <- analysis$posteriors$primary
   write_table(
     "endorse_results", c(
@@ -105,6 +139,47 @@ paper_numbers <- function(analysis) {
     MixedCount = as.character(analysis$anomalies[["mixed"]]),
     RepeatedCount = as.character(analysis$anomalies[["repeated"]]), AnomalyCount = as.character(analysis$excluded),
     CleanATE = number(analysis$clean_ate, 5), AwareLower = percent(max(0, (mean(analysis$treated) - 0.3) / 0.7))
+  )
+  points <- function(value) sprintf("%+.1f", 100 * value)
+  change <- function(row) {
+    paste0("$", points(row$difference), "$ [$", points(row$lower), "$, $", points(row$upper), "$]")
+  }
+  moments <- analysis$moments
+  strong <- moments[moments$first == "FCR" & moments$second == "Durand", ]
+  weak <- moments[moments$first != "FCR" | moments$second != "Durand", ]
+  bins <- analysis$person_means$bins
+  bin <- function(label) bins[bins$bin == label, ]
+  values <- c(values,
+    StrongPairControl = number(strong$control, 2), StrongPairEndorsed = number(strong$treated, 2),
+    StrongPairChange = sprintf("$%+.2f$", strong$difference),
+    StrongPairInterval = sprintf("[$%+.2f$, $%+.2f$]", strong$lower, strong$upper),
+    WeakPairChangeMin = sprintf("%.2f", min(weak$difference)),
+    WeakPairChangeMax = sprintf("%.2f", max(weak$difference)),
+    WeakPairLowerMin = sprintf("%.2f", min(weak$lower)),
+    MidpointControl = percent(bin("0.5")$control, 1), MidpointEndorsed = percent(bin("0.5")$treated, 1),
+    MidpointChange = change(bin("0.5")), BelowMidpointChange = change(bin("0.4375")),
+    AboveMidpointChange = change(bin("0.5625")), NextAboveChange = change(bin("0.625")),
+    LowerTailChange = change(bin("$\\leq 0.375$")), TopChange = change(bin("0.875--0.9375")),
+    AllCeilingControl = percent(bin("1")$control, 1), AllCeilingChange = change(bin("1")),
+    TopThirdShare = percent(bin("0.875--0.9375")$control + bin("1")$control, 1)
+  )
+  worlds <- analysis$reaction_worlds
+  one_sided <- worlds[worlds$world == "Opposition only", ]
+  two_sided <- worlds[worlds$world == "Both directions", ]
+  signed <- function(value) sprintf("$%+.1f$", 100 * value)
+  values <- c(values,
+    OneSidedOpposeMin = percent(min(one_sided$oppose)), OneSidedOpposeMax = percent(max(one_sided$oppose)),
+    OneSidedMidpointMin = signed(min(one_sided$midpoint)), OneSidedMidpointMax = signed(max(one_sided$midpoint)),
+    OneSidedMidpointLowest = number(100 * abs(min(one_sided$midpoint_lower)), 1),
+    TwoSidedMidpointMin = signed(max(two_sided$midpoint)), TwoSidedMidpointMax = signed(min(two_sided$midpoint)),
+    TwoSidedTopFavour = percent(max(two_sided$favour)), TwoSidedTopOppose = percent(max(two_sided$oppose)),
+    TwoSidedAboveMax = signed(max(two_sided$above))
+  )
+  # Sharp lower bounds on the shares whose mean answer fell or rose, from the two marginals alone.
+  full <- analysis$person_means$full
+  gap <- cumsum(full$treated) - cumsum(full$control)
+  values <- c(values,
+    MeanFallBound = percent(max(0, gap), 1), MeanRiseBound = percent(max(0, -gap), 1)
   )
   for (spec in c("covariates", "hierarchical")) {
     posterior <- analysis$posteriors[[spec]]

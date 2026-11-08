@@ -1,0 +1,94 @@
+fit_stan.py:30: FutureWarning: DataFrameGroupBy.apply operated on the grouping columns. This behavior is deprecated, and in a future version of pandas the grouping columns will be excluded from the operation. Either pass `include_groups=False` to exclude the groupings or explicitly select the grouping columns after groupby to silence this warning.
+  cells = long.groupby(["item", "group", "cell_inc"], sort=False).apply(lambda d: (d.index.min() + 1, d.index.max() + 1))
+17:37:58 - cmdstanpy - INFO - compiling stan file endorse_shared_v.stan to exe file endorse_shared_v
+17:38:04 - cmdstanpy - INFO - compiled model executable: endorse_shared_v
+17:38:05 - cmdstanpy - INFO - created output directory: fit_additive
+17:38:05 - cmdstanpy - INFO - CmdStan start processing
+17:38:05 - cmdstanpy - INFO - Chain [1] start processing
+17:38:05 - cmdstanpy - INFO - Chain [2] start processing
+17:38:05 - cmdstanpy - INFO - Chain [3] start processing
+17:38:05 - cmdstanpy - INFO - Chain [4] start processing
+17:53:17 - cmdstanpy - INFO - Chain [4] done processing
+17:53:27 - cmdstanpy - INFO - Chain [1] done processing
+17:53:31 - cmdstanpy - INFO - Chain [2] done processing
+17:53:51 - cmdstanpy - INFO - Chain [3] done processing
+17:53:51 - cmdstanpy - WARNING - Non-fatal error during sampling:
+Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -5162.13, but should be greater than the previous element, -5162.13 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -5163.54, but should be greater than the previous element, -5163.54 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -1290.71, but should be greater than the previous element, -1290.71 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -323.315, but should be greater than the previous element, -323.315 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -81.1337, but should be greater than the previous element, -81.1337 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -20.5914, but should be greater than the previous element, -20.5914 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -754773, but should be greater than the previous element, -754773 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -21560.6, but should be greater than the previous element, -21560.6 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -210.207, but should be greater than the previous element, -210.207 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -9379.12, but should be greater than the previous element, -9379.12 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -9379.97, but should be greater than the previous element, -9379.97 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -2343.66, but should be greater than the previous element, -2343.66 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -584.609, but should be greater than the previous element, -584.609 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -145.241, but should be greater than the previous element, -145.241 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -35.2545, but should be greater than the previous element, -35.2545 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -116548, but should be greater than the previous element, -116548 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -1621.46, but should be greater than the previous element, -1621.46 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -33050.2, but should be greater than the previous element, -33050.2 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -33047.6, but should be greater than the previous element, -33047.6 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -8263.18, but should be greater than the previous element, -8263.18 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -2067.34, but should be greater than the previous element, -2067.34 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -517.933, but should be greater than the previous element, -517.933 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 3 is -130.849, but should be greater than the previous element, -130.849 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 3 is -34.0528, but should be greater than the previous element, -34.0528 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 3 is -9.7445, but should be greater than the previous element, -9.7445 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -1.08963e+06, but should be greater than the previous element, -1.08963e+06 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -31123.3, but should be greater than the previous element, -31123.3 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -304.505, but should be greater than the previous element, -304.505 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -10537.8, but should be greater than the previous element, -10537.8 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -10539.5, but should be greater than the previous element, -10539.5 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -2634.3, but should be greater than the previous element, -2634.3 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -657.319, but should be greater than the previous element, -657.319 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -163.082, but should be greater than the previous element, -163.082 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 3 is -39.3808, but should be greater than the previous element, -39.3808 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -10.9594, but should be greater than the previous element, -10.9594 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -1.58107e+06, but should be greater than the previous element, -1.58107e+06 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -45159.9, but should be greater than the previous element, -45159.9 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+	Exception: ordered_probit: Cut-points is not a valid ordered vector. The element at 2 is -436.904, but should be greater than the previous element, -436.904 (in 'endorse_shared_v.stan', line 65, column 6 to column 88)
+Consider re-running with show_console=True if the above output is unclear!
+               Mean     5%    95%  R_hat  ESS_bulk
+beta[1]       0.139  0.104  0.174  1.003  1656.790
+beta[2]       1.122  0.969  1.336  1.205    14.855
+beta[3]       2.671  1.705  4.598  1.231    13.571
+beta[4]       0.345  0.309  0.383  1.024   170.397
+lambda[1,1]  -0.041 -0.094  0.013  1.005  1391.430
+lambda[2,1]  -0.072 -0.129 -0.016  1.005  1449.780
+lambda[3,1]  -0.003 -0.059  0.053  1.001  2792.730
+lambda[4,1]  -0.016 -0.072  0.041  1.002  2497.760
+omega_eta[1]  0.560  0.513  0.608  1.026   270.682
+s_k[1]        0.899  0.846  0.956  1.038    85.693
+s_k[2]        0.932  0.879  0.986  1.021   187.332
+s_k[3]        0.999  0.938  1.062  1.050    59.284
+s_k[4]        0.952  0.899  1.006  1.018   231.175
+rho[1]        0.888  0.826  0.949  1.099    28.285
+mu_x[1]       0.000  0.000  0.000    NaN       NaN
+mu_x[2]       0.000  0.000  0.000    NaN       NaN
+mu_x[3]       0.000  0.000  0.000    NaN       NaN
+sd_x[1]       1.000  1.000  1.000    NaN       NaN
+sd_x[2]       1.000  1.000  1.000    NaN       NaN
+sd_x[3]       1.000  1.000  1.000    NaN       NaN
+Checking sampler transitions treedepth.
+Treedepth satisfactory for all transitions.
+
+Checking sampler transitions for divergences.
+No divergent transitions found.
+
+Checking E-BFMI - sampler transitions HMC potential energy.
+The E-BFMI, 0.02, is below the nominal threshold of 0.30 which suggests that HMC may have trouble exploring the target distribution.
+If possible, try to reparameterize the model.
+
+Rank-normalized split effective sample size satisfactory for all parameters.
+
+The following parameters had rank-normalized split R-hat greater than 1.01:
+  beta[2], beta[3], beta[4], tau[1,1], tau[2,1], tau[3,1], tau[4,1], tau[1,2], tau[2,2], tau[3,2], tau[2,3], tau[3,3], tau[2,4], tau[3,4], omega_eta[1], s_k[1], s_k[2], s_k[3], s_k[4], rho[1], z_x[24], z_x[35], z_x[36], z_x[39], z_x[40], z_x[44], z_x[53], z_x[54], z_x[63], z_x[78], z_x[94], z_x[95], z_x[101], z_x[119], z_x[125], z_x[126], z_x[131], z_x[132], z_x[136], z_x[140], z_x[154], z_x[159], z_x[177], z_x[181], z_x[207], z_x[212], z_x[213], z_x[216], z_x[223], z_x[228], z_x[243], z_x[247], z_x[249], z_x[255], z_x[260], z_x[264], z_x[266], z_x[280], z_x[282], z_x[287], z_x[288], z_x[290], z_x[292], z_x[307], z_x[322], z_x[328], z_x[340], z_x[354], z_x[363], z_x[373], z_x[374], z_x[387], z_x[413], z_x[427], z_x[428], z_x[444], z_x[497], z_x[519], z_x[522], z_x[523], z_x[532], z_x[543], z_x[544], z_x[567], z_x[572], z_x[582], z_x[591], z_x[593], z_x[594], z_x[601], z_x[603], z_x[611], z_x[631], z_x[632], z_x[639], z_x[655], z_x[669], z_x[673], z_x[676], z_x[692], z_x[701], z_x[723], z_x[755], z_x[756], z_x[757], z_x[760], z_x[777], z_x[821], z_x[872], z_x[937], z_x[955], z_x[983], z_x[998], z_x[1002], z_x[1018], z_x[1022], z_x[1023], z_x[1042], z_x[1061], z_x[1062], z_x[1064], z_x[1072], z_x[1076], z_x[1083], z_x[1086], z_x[1092], z_x[1093], z_x[1094], z_x[1100], z_x[1109], z_x[1116], z_x[1120], z_x[1132], z_x[1142], z_x[1160], z_x[1173], z_x[1175], z_x[1185], z_x[1188], z_x[1191], z_x[1192], z_x[1194], z_x[1204], z_x[1206], z_x[1207], z_x[1209], z_x[1210], z_x[1213], z_x[1220], z_x[1261], z_x[1312], z_x[1329], z_x[1331], z_x[1338], z_x[1340], z_x[1346], z_x[1355], z_x[1364], z_x[1379], z_x[1418], z_x[1425], z_x[1426], z_x[1427], z_x[1435], z_x[1437], z_x[1440], z_x[1449], z_x[1450], z_x[1481], z_x[1494], z_x[1522], z_x[1557], z_x[1566], z_x[1569], z_x[1584], z_x[1588], z_x[1592], z_x[1595], z_x[1613], z_x[1619], z_x[1620], z_x[1622], z_x[1638], z_x[1650], z_x[1681], z_x[1691], z_x[1741], z_x[1770], z_x[1786], z_x[1789], z_x[1817], z_x[1819], z_x[1833], z_x[1855], z_x[1858], z_x[1873], z_x[1879], z_x[1884], z_x[1885], z_x[1891], z_x[1892], z_x[1895], z_x[1907], z_x[1909], z_x[1932], z_x[1936], z_x[1941], z_x[1945], z_x[1946], z_x[1948], z_x[1959], z_x[1962], z_x[1967], z_x[1969], z_x[1973], z_x[1974], z_x[1982], z_x[1987], z_x[1989], z_x[1995], z_x[1998], z_x[2004], z_x[2012], z_x[2019], z_x[2022], z_x[2023], z_x[2041], z_x[2048], z_x[2070], z_x[2072], z_x[2073], z_x[2095], z_x[2126], z_x[2137], z_x[2157], z_x[2169], z_x[2173], z_x[2204], z_x[2216], z_x[2248], z_x[2257], z_x[2286], z_x[2296], z_x[2297], z_x[2302], z_x[2303], z_x[2307], z_x[2309], z_x[2316], z_x[2318], z_x[2322], z_x[2333], z_x[2348], z_x[2362], z_x[2379], z_x[2392], z_x[2408], z_x[2419], z_x[2531], z_x[2538], z_x[2545], z_x[2548], z_x[2559], z_x[2571], z_x[2584], z_x[2593], z_x[2594], z_x[2596], z_x[2598], z_x[2600], z_x[2613], z_x[2614], z_x[2617], z_x[2619], z_x[2624], z_x[2627], z_x[2628], z_x[2638], z_x[2639], z_x[2649], z_x[2654], z_x[2655], z_x[2659], z_x[2665], z_x[2677], z_x[2686], z_x[2695], z_x[2697], z_x[2723], z_x[2736], z_x[2737], z_x[2747], z_x[2753], z_x[2759], z_x[2786], z_x[2788], z_x[2795], z_x[2804], z_x[2810], z_x[2813], z_x[2815], z_x[2830], z_x[2831], z_x[2833], z_x[2844], z_x[2846], z_x[2866], z_x[2869], z_x[2890], z_x[2904], z_x[2908], z_x[2911], z_x[2913], z_x[2916], z_x[2919], z_x[2934], z_x[2951], z_x[2956], z_x[3007], z_x[3040], z_x[3043], z_x[3047], z_x[3049], z_x[3054], z_x[3055], z_x[3058], z_x[3059], z_x[3070], z_x[3071], z_x[3091], z_x[3104], z_x[3112], z_x[3116], z_x[3123], z_x[3124], z_x[3181], z_x[3188], z_x[3210], z_x[3229], z_x[3233], z_x[3243], z_x[3247], z_x[3250], z_x[3251], z_x[3252], z_x[3257], z_x[3265], z_x[3267], z_x[3272], z_x[3307], z_x[3311], z_x[3326], z_x[3331], z_x[3335], z_x[3354], z_x[3358], z_x[3360], z_x[3363], z_x[3365], z_x[3370], z_x[3371], z_x[3373], z_x[3375], z_x[3380], z_x[3392], z_x[3393], z_x[3402], z_x[3406], z_x[3420], z_x[3423], z_x[3424], z_x[3435], z_x[3440], z_x[3450], z_x[3458], z_x[3463], z_x[3472], z_x[3485], z_x[3490], z_x[3508], z_x[3510], z_x[3513], z_x[3519], z_x[3531], z_x[3532], z_x[3535], z_x[3538], z_x[3558], z_x[3578], z_x[3605], z_x[3624], z_x[3631], z_x[3634], z_x[3640], z_x[3646], z_x[3650], z_x[3659], z_x[3665], z_x[3669], z_x[3671], z_x[3679], z_x[3689], z_x[3691], z_x[3696], z_x[3699], z_x[3712], z_x[3721], z_x[3727], z_x[3736], z_x[3757], z_x[3759], z_x[3763], z_x[3778], z_x[3781], z_x[3807], z_x[3808], z_x[3814], z_x[3821], z_x[3829], z_x[3846], z_x[3851], z_x[3854], z_x[3878], z_x[3884], z_x[3913], z_x[3932], z_x[3943], z_x[3962], z_x[3963], z_x[3968], z_x[3969], z_x[3970], z_x[3971], z_x[3973], z_x[3978], z_x[3979], z_x[3986], z_x[3996], z_x[3998], z_x[3999], z_x[4013], z_x[4022], z_x[4028], z_x[4029], z_x[4030], z_x[4039], z_x[4041], z_x[4059], z_x[4062], z_x[4065], z_x[4089], z_x[4090], z_x[4094], z_x[4109], z_x[4117], z_x[4124], z_x[4126], z_x[4127], z_x[4130], z_x[4133], z_x[4151], z_x[4164], z_x[4194], z_x[4203], z_x[4205], z_x[4213], z_x[4214], z_x[4227], z_x[4229], z_x[4236], z_x[4237], z_x[4249], z_x[4267], z_x[4291], z_x[4308], z_x[4309], z_x[4340], z_x[4392], z_x[4417], z_x[4431], z_x[4441], z_x[4467], z_x[4473], z_x[4480], z_x[4481], z_x[4485], z_x[4496], z_x[4501], z_x[4505], z_x[4515], z_x[4523], z_x[4526], z_x[4532], z_x[4641], z_x[4664], z_x[4679], z_x[4682], z_x[4683], z_x[4690], z_x[4693], z_x[4697], z_x[4710], z_x[4712], z_x[4714], z_x[4715], z_x[4716], z_x[4722], z_x[4723], z_x[4732], z_x[4743], z_x[4762], z_x[4769], z_x[4775], z_x[4777], z_x[4805], z_x[4815], z_x[4826], z_x[4829], z_x[4830], z_x[4841], z_x[4842], z_x[4846], z_x[4878], z_x[4881], z_x[4889], z_x[4893], z_x[4902], z_x[4906], z_x[4926], z_x[4936], z_x[4938], z_x[4943], z_x[4958], z_x[4968], z_x[4971], z_x[4978], z_x[4983], z_x[4987], z_x[4998], z_x[5004], z_x[5005], z_x[5016], z_x[5039], z_x[5042], z_x[5045], z_x[5058], z_x[5064], z_x[5077], z_x[5079], z_x[5089], z_x[5093], z_x[5143], z_x[5160], z_x[5165], z_x[5167], z_x[5180], z_x[5181], z_x[5206], z_x[5212], z_eta[1987], z_eta[4641]
+Such high values indicate incomplete mixing and biased estimation.
+You should consider regularizing your model with additional prior information or a more effective parameterization.
+
+Processing complete.
+

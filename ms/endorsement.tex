@@ -100,6 +100,51 @@ Adding gender, rurality, education, and income covariates raises the average pos
 \tablenote{Posterior means with 95\% credible intervals in brackets. All specifications use the unweighted package sample. Baseline reactions have common group means; covariate means depend on individual characteristics; hierarchical means vary by division. The average row weights endorsers equally.}
 \end{table}
 
+\section{Within-Respondent Patterns}
+\label{sec:within}
+
+Each respondent answers all four policy questions. Endorsed respondents receive a different group on each question; control respondents receive none. Random assignment therefore gives the control arm's joint distribution of the four answers as the counterfactual for the endorsed arm. Two features of that joint distribution bear on the measurement model: how a respondent's answers move together across policies, and the distribution of each respondent's mean answer. Neither requires a model. The \MixedCount{} respondents with both control and endorsed items are excluded from this section; intervals are percentile bootstrap intervals over respondents.
+
+In the measurement model, reactions are independent across questions for the same respondent, so the correlation between any two policy answers is the same with and without an endorsement, apart from the effect of the mean shift on the discrete scale. \Cref{tab:within_correlation} shows that the correlations change, and not in one direction. The two policies whose answers are most strongly related in the control arm, Frontier Crimes Regulation reform and the Durand Line, become less related under endorsement: the correlation falls from \StrongPairControl{} to \StrongPairEndorsed{} (\StrongPairChange{}, 95\% interval \StrongPairInterval{}). Every other pair becomes more related, by \WeakPairChangeMin{} to \WeakPairChangeMax{}, with every interval excluding zero. A reaction that each respondent carries across all four endorsements raises every pairwise correlation; a cue that also loosens the link between an answer and the respondent's policy position lowers the correlation for the pair most tightly linked to that position. The pattern is consistent with both operating together. It is not consistent with reactions that are independent across questions, and it is not consistent with reactions that enter each question in proportion to that question's loading on the latent position, which would raise the FCR--Durand correlation most.
+
+\begin{table}[htbp]
+\centering\TableStyle
+\caption{Correlations between policy answers, by arm}
+\label{tab:within_correlation}
+\begin{adjustbox}{max width=\linewidth}
+\input{../tabs/within_correlation.tex}
+\end{adjustbox}
+\tablenote{Pearson correlations between the rescaled answers to two policies, across respondents within each arm. Intervals are 95\% percentile bootstrap intervals for the difference, resampling respondents within arms. Respondents with both control and endorsed items are excluded.}
+\end{table}
+
+\Cref{tab:person_means} compares the distribution of each respondent's mean answer across the four policies. Indifference predicts no change. In the control arm, \MidpointControl{} of respondents have answers that average exactly the midpoint of the scale; under endorsement \MidpointEndorsed{} do, a change of \MidpointChange{} percentage points. Mass appears on both sides of the midpoint: \BelowMidpointChange{} points one step below and \AboveMidpointChange{} points one step above, while the bin two steps above is unchanged (\NextAboveChange{}). The gain one step above the midpoint cannot have come from above, so some respondents at the midpoint moved up. The rest of the distribution drifts down: the lower tail gains \LowerTailChange{} points and the upper bins lose a little, although those changes are not distinguishable from zero. The share of respondents at the top of the scale on all four policies is \AllCeilingControl{} in the control arm and changes by \AllCeilingChange{} points under endorsement. Favorable reactions among the \TopThirdShare{} of respondents averaging 0.875 or higher are largely invisible by construction; unfavorable reactions anywhere are not.
+
+\begin{table}[htbp]
+\centering\TableStyle
+\caption{Distribution of each respondent's mean answer, by arm}
+\label{tab:person_means}
+\begin{adjustbox}{max width=\linewidth}
+\input{../tabs/person_means.tex}
+\end{adjustbox}
+\tablenote{Mean of a respondent's four rescaled answers, which takes values in sixteenths. Sparse bins are pooled. Differences are in percentage points of respondents; intervals are 95\% percentile bootstrap intervals, resampling respondents within arms.}
+\end{table}
+
+The most direct alternative to offsetting reactions is a minority that reacts strongly against the endorser while everyone else is unmoved. That alternative also produces a small average effect and greater dispersion. To see whether it can produce the midpoint pattern, \cref{tab:reaction_worlds} builds endorsed arms from the control respondents themselves. In each simulated arm, a reacting respondent moves each of their four answers one step in their direction with a fixed probability, and the share of opponents is chosen so the expected average effect equals the observed one. Opposition alone, held by \OneSidedOpposeMin{} to \OneSidedOpposeMax{} of respondents depending on how many answers move, leaves the midpoint share where it was (changes of \OneSidedMidpointMin{} to \OneSidedMidpointMax{} points). Respondents leaving the midpoint downward are replaced by respondents arriving from above. In 97.5\% of simulated samples of the observed size, opposition alone lowers the midpoint share by less than \OneSidedMidpointLowest{} points; the observed change is \MidpointChange{}. Adding a favorable group empties the midpoint: with \TwoSidedTopFavour{} favorable and \TwoSidedTopOppose{} opposed, the change is \TwoSidedMidpointMax{} points. No simulated world reproduces the observed gain one step above the midpoint (at most \TwoSidedAboveMax{} points on average, against \AboveMidpointChange{} observed).
+
+\begin{table}[htbp]
+\centering\TableStyle
+\caption{Observed and simulated changes under endorsement}
+\label{tab:reaction_worlds}
+\begin{adjustbox}{max width=\linewidth}
+\input{../tabs/reaction_worlds.tex}
+\end{adjustbox}
+\tablenote{Changes from the control arm. The first row is the observed endorsed arm, with 95\% percentile bootstrap intervals resampling respondents within arms. Other rows are simulated endorsed arms built by resampling control respondents to the size of the endorsed arm. A reacting respondent moves each answer one step (0.25) down if opposed or up if favorable, with the probability shown as answers moved, truncated at the ends of the scale. The opposed share is set so the expected average effect equals the observed one. Simulated rows report the mean and the 2.5th and 97.5th percentiles over 500 simulated samples. Spread is the variance of a respondent's mean answer. Midpoint is the share of respondents whose answers average 0.5; one below and one above are the shares averaging 0.4375 and 0.5625.}
+\end{table}
+
+This comparison holds the counterfactual fixed at the observed control arm and varies only the direction of reactions. It assumes that whether and how a respondent reacts is unrelated to where their answers would otherwise sit. Without that assumption the marginal distributions alone guarantee only that some respondents moved down: a sharp lower bound on the share whose mean answer fell is \MeanFallBound{}, while the corresponding bound for a rise is \MeanRiseBound{}, because a reaction that lowers only the answers of respondents just above the midpoint could refill it. The comparison also does not exclude every mechanism that moves answers in both directions. An endorsement could, for example, push respondents off the middle of the scale toward their own policy views without any of them reacting to the group; that mechanism also empties the midpoint. What the comparison excludes is the reading under which the small average effect comes from a group that reacts in one direction while the rest do not react at all.
+
+These patterns do not identify a proportion of favorable reactions. They establish that endorsements produce reactions that respondents carry across questions, that those reactions are large relative to the average effect, and that where movement in both directions is observable it occurs in both directions. The small average effect reflects opposing reactions that offset, not an absence of reactions.
+
 \section{Behavioral Assumptions and Supporter Proportions}
 \label{sec:framework}
 
@@ -240,7 +285,7 @@ Researchers should distinguish the average effect on an observed response, the f
 
 Reporting treatment and control distributions alongside the ATE makes such assumptions easier to assess. Endpoint restrictions can be checked against interior responses; ceiling constraints are visible in the baseline distribution. Model-based positive probabilities should be reported with credible intervals, the population over which they are averaged, and evidence about model fit and sensitivity to priors.
 
-The present reanalysis leaves several substantive checks open: population adjustment, Bayesian sensitivity to the assignment exclusions, prior sensitivity, and posterior predictive fit. Endorsement credibility is another measurement question. If respondents disbelieve a cue or infer information beyond the endorser's identity, the mapping to attitudes can change; the direction of that change is not established by the ATE alone.
+The within-respondent patterns in \cref{sec:within} are the first such check this paper applies, and the baseline measurement model does not pass it: the model implies unchanged correlations across policy answers, and the data show correlations that rise for most pairs and fall for one. A model in which a reaction shifts a respondent's answers directly, rather than through the latent position, is the natural alternative; estimating the proportion of favorable reactions under it is left for future work. The present reanalysis also leaves open population adjustment, Bayesian sensitivity to the assignment exclusions, prior sensitivity, and posterior predictive fit of the baseline model. Endorsement credibility is another measurement question. If respondents disbelieve a cue or infer information beyond the endorser's identity, the mapping to attitudes can change; the direction of that change is not established by the ATE alone.
 
 \section{Conclusion}
 \label{sec:conclusion}

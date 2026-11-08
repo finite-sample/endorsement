@@ -14,3 +14,9 @@ ms/*.fls
 ms/*.xdv
 ms/*.synctex.gz
 data/endorse_fits_*.rds
+
+# Exploratory model fits: draws and compiled models are large and reproducible
+exploration/reaction-models/runs/
+exploration/reaction-models/endorse_mixture
+exploration/reaction-models/endorse_shared_v
+__pycache__/

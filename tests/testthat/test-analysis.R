@@ -66,3 +66,52 @@ test_that("empirical results survive the language migration", {
   expect_equal(analysis$excluded, 129L)
   expect_equal(analysis$clean_ate, -0.012719900088725256, tolerance = 1e-12)
 })
+
+test_that("within-respondent moments separate shared reactions from independent noise", {
+  make <- function(values, codes) {
+    responses <- expand.grid(policy = policies, respondent = seq_len(nrow(values)), stringsAsFactors = FALSE)
+    responses$response <- as.vector(t(values))
+    responses$endorser <- codes[responses$respondent]
+    responses[, c("respondent", "policy", "endorser", "response")]
+  }
+  set.seed(7)
+  n <- 400L
+  base <- matrix(rep(stats::rnorm(2L * n), each = 4L), ncol = 4L, byrow = TRUE)
+  values <- (base + 0.5 * matrix(stats::rnorm(8L * n), ncol = 4L))
+  values[(n + 1L):(2L * n), ] <- values[(n + 1L):(2L * n), ] + matrix(rep(stats::rnorm(n), 4L), ncol = 4L)
+  codes <- rep(c("a", "b"), each = n)
+  moments <- within_respondent_moments(make(values, codes), draws = 200L)
+  expect_equal(nrow(moments), 6L)
+  expect_true(all(moments$difference > 0))
+  expect_true(all(moments$lower <= moments$difference & moments$difference <= moments$upper))
+  # Independent noise added to the endorsed arm leaves the correlations unchanged in expectation.
+  noisy <- values
+  noisy[(n + 1L):(2L * n), ] <- base[(n + 1L):(2L * n), ] + 0.5 * matrix(stats::rnorm(4L * n), ncol = 4L)
+  noise_only <- within_respondent_moments(make(noisy, codes), draws = 200L)
+  expect_true(all(noise_only$lower < 0 & noise_only$upper > 0))
+  mixed <- make(values, codes)
+  mixed$endorser[mixed$respondent == 1L & mixed$policy == "FCR"] <- "c"
+  expect_equal(nrow(respondent_matrix(mixed)$values), 2L * n - 1L)
+})
+
+test_that("person-mean distributions are shares that sum to one in each arm", {
+  distribution <- person_mean_distribution(reshape_responses(respondents), draws = 50L)
+  for (table in distribution) {
+    expect_equal(sum(table$control), 1)
+    expect_equal(sum(table$treated), 1)
+    expect_equal(table$difference, table$treated - table$control)
+    expect_true(all(table$lower <= table$upper))
+  }
+  expect_equal(nrow(distribution$full), 17L)
+  expect_equal(distribution$bins$control[distribution$bins$bin == "1"], distribution$full$control[17L])
+})
+
+test_that("simulated opposition alone moves mass through the midpoint without emptying it", {
+  worlds <- reaction_worlds(reshape_responses(respondents), simulations = 100L)
+  one_sided <- worlds[worlds$world == "Opposition only", ]
+  expect_true(all(abs(one_sided$midpoint) < 0.005))
+  expect_true(all(diff(one_sided$oppose) < 0))
+  both <- worlds[worlds$world == "Both directions", ]
+  expect_true(all(diff(both$midpoint) < 0))
+  expect_lt(worlds$midpoint_upper[worlds$world == "Observed"], 0)
+})
