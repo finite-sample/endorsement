@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 arguments <- commandArgs(trailingOnly = TRUE)
-for (module in c("data", "analysis", "model", "paper")) source(file.path("R", paste0(module, ".R")))
+for (module in c("data", "analysis", "model", "format", "paper")) source(file.path("R", paste0(module, ".R")))
 if (!length(arguments) || !arguments[1] %in% c("prepare", "fit", "summarize", "analysis")) {
   stop("Usage: Rscript scripts/run.R prepare | analysis | fit <spec> [iterations burn thin] | summarize [spec]")
 }

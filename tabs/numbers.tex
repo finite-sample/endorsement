@@ -1,56 +1,111 @@
-\newcommand{\SampleSize}{5,212}
-\newcommand{\ControlCount}{10,619}
-\newcommand{\TreatmentCount}{10,229}
-\newcommand{\BaselineMean}{0.736}
-\newcommand{\PooledATE}{-0.013}
-\newcommand{\PooledATEPoints}{1.3}
+\newcommand{\FullSampleSize}{5,479}
+\newcommand{\SampleSize}{5,166}
+\newcommand{\InterviewerCount}{75}
+\newcommand{\CleanInterviewerCount}{72}
+\newcommand{\UnflaggedSampleSize}{3,728}
+\newcommand{\UnflaggedInterviewerCount}{59}
+\newcommand{\FlaggedCount}{16}
+\newcommand{\MedianInterviews}{52}
+\newcommand{\MinInterviews}{6}
+\newcommand{\MaxInterviews}{285}
+\newcommand{\SuspectInterviews}{313}
+\newcommand{\SuspectShare}{5.7\%}
+\newcommand{\SuspectControl}{187}
+\newcommand{\SuspectEndorsed}{125}
+\newcommand{\SuspectPatternControl}{121}
+\newcommand{\SuspectPatternEndorsed}{73}
+\newcommand{\SuspectBalanceP}{0.001}
+\newcommand{\MidpointCountControl}{291}
+\newcommand{\MidpointCountSuspect}{122}
+\newcommand{\MidpointCountEndorsed}{187}
+\newcommand{\MidpointCountEndorsedSuspect}{8}
+\newcommand{\SuspectTopShareMin}{35\%}
+\newcommand{\SuspectTopShareMax}{65\%}
+\newcommand{\SuspectExpectedMax}{21\%}
+\newcommand{\FullATE}{-0.013}
+\newcommand{\FullATEPoints}{1.3}
+\newcommand{\FullSE}{0.007}
+\newcommand{\PooledATE}{-0.021}
+\newcommand{\PooledATEPoints}{2.1}
 \newcommand{\PooledSE}{0.005}
-\newcommand{\TreatmentMean}{0.723}
-\newcommand{\PrimaryShare}{43\%}
-\newcommand{\PrimaryInterval}{32\%--53\%}
-\newcommand{\MaxMeanReaction}{0.08}
-\newcommand{\AfghanShare}{32\%}
-\newcommand{\AfghanInterval}{2\%--49\%}
-\newcommand{\AfghanNegativeProbability}{0.98}
-\newcommand{\MaxRhat}{1.016}
-\newcommand{\MinESS}{1355}
-\newcommand{\SmallSymmetricShare}{18\%}
-\newcommand{\ExtremeShare}{99\%}
-\newcommand{\CeilingShare}{42\%}
-\newcommand{\DiscreteOneShare}{59\%}
-\newcommand{\LowerBound}{1\%}
-\newcommand{\UpperBound}{58\%}
-\newcommand{\MixedCount}{35}
+\newcommand{\PooledInterviewerSE}{0.005}
+\newcommand{\UnflaggedATE}{-0.028}
+\newcommand{\FullMidpointChange}{$-3.5$ [$-8.8$, $+0.7$]}
+\newcommand{\FullAboveChange}{$+2.7$ [$+0.2$, $+5.6$]}
+\newcommand{\CleanMidpointChange}{$+0.5$ [$-1.1$, $+1.8$]}
+\newcommand{\CleanAboveChange}{$+0.5$ [$-0.7$, $+1.9$]}
+\newcommand{\FullMidpointDrop}{3.5}
+\newcommand{\FullCorrelationsRising}{5}
+\newcommand{\BaselineMean}{0.746}
+\newcommand{\TreatmentMean}{0.726}
+\newcommand{\ControlCount}{10,364}
+\newcommand{\TreatmentCount}{10,300}
+\newcommand{\PrimaryShare}{38\%}
+\newcommand{\PrimaryInterval}{29\%--45\%}
+\newcommand{\FullPrimaryShare}{43\%}
+\newcommand{\FullPrimaryInterval}{31\%--52\%}
+\newcommand{\MaxMeanReaction}{0.16}
+\newcommand{\AfghanShare}{27\%}
+\newcommand{\AfghanInterval}{4\%--41\%}
+\newcommand{\MaxRhat}{1.04}
+\newcommand{\MinESS}{1,389}
+\newcommand{\SmallSymmetricShare}{15\%}
+\newcommand{\ExtremeShare}{98\%}
+\newcommand{\CeilingShare}{41\%}
+\newcommand{\DiscreteOneShare}{57\%}
+\newcommand{\LowerBound}{0\%}
+\newcommand{\UpperBound}{59\%}
+\newcommand{\MixedCount}{34}
 \newcommand{\RepeatedCount}{94}
-\newcommand{\AnomalyCount}{129}
-\newcommand{\CleanATE}{-0.013}
-\newcommand{\StrongPairControl}{0.66}
-\newcommand{\StrongPairEndorsed}{0.54}
-\newcommand{\StrongPairChange}{$-0.12$}
-\newcommand{\StrongPairInterval}{[$-0.16$, $-0.07$]}
-\newcommand{\WeakPairChangeMin}{0.07}
-\newcommand{\WeakPairChangeMax}{0.18}
-\newcommand{\MidpointControl}{10.8\%}
+\newcommand{\AnomalyCount}{128}
+\newcommand{\CleanATE}{-0.021}
+\newcommand{\HeterogeneityStat}{93.1}
+\newcommand{\HeterogeneityDF}{59}
+\newcommand{\HeterogeneityP}{0.003}
+\newcommand{\HeterogeneityTested}{60}
+\newcommand{\HeterogeneityStatClean}{54.8}
+\newcommand{\HeterogeneityDFClean}{56}
+\newcommand{\HeterogeneityPClean}{0.519}
+\newcommand{\ZeroVarianceCount}{2}
+\newcommand{\SuspectZRanks}{1, 2, 3}
+\newcommand{\SuspectShiftRanks}{1, 3, 8}
+\newcommand{\SuspectEffectMin}{$+3.7$}
+\newcommand{\SuspectEffectMax}{$+8.2$}
+\newcommand{\QuestionnaireItems}{92}
+\newcommand{\MatchMedian}{79\%}
+\newcommand{\MatchEightyFive}{31\%}
+\newcommand{\MatchNinety}{17\%}
+\newcommand{\MatchTwins}{1.8\%}
+\newcommand{\DuplicatePairs}{79}
+\newcommand{\DuplicatingInterviewers}{13}
+\newcommand{\TopDuplicators}{45, 36, 55}
+\newcommand{\TopDuplicatorPairs}{21, 18, 11}
+\newcommand{\UnduplicatedATE}{-0.023}
+\newcommand{\UnduplicatedSampleSize}{3,861}
+\newcommand{\CorrelationsRising}{4}
+\newcommand{\CorrelationsExcludingZero}{1}
+\newcommand{\MidpointControl}{6.6\%}
 \newcommand{\MidpointEndorsed}{7.0\%}
-\newcommand{\MidpointChange}{$-3.8$ [$-5.4$, $-2.3$]}
-\newcommand{\BelowMidpointChange}{$+2.1$ [$+1.0$, $+3.1$]}
-\newcommand{\AboveMidpointChange}{$+2.7$ [$+1.1$, $+4.3$]}
-\newcommand{\NextAboveChange}{$+0.1$ [$-1.7$, $+1.8$]}
-\newcommand{\LowerTailChange}{$+1.7$ [$+0.7$, $+2.7$]}
-\newcommand{\AllCeilingControl}{16.4\%}
-\newcommand{\AllCeilingChange}{$-0.3$ [$-2.1$, $+1.8$]}
-\newcommand{\TopThirdShare}{31.1\%}
-\newcommand{\OneSidedOpposeMin}{5\%}
-\newcommand{\OneSidedOpposeMax}{22\%}
-\newcommand{\OneSidedMidpointMin}{$+0.0$}
-\newcommand{\OneSidedMidpointMax}{$+0.1$}
-\newcommand{\OneSidedMidpointLowest}{1.8}
-\newcommand{\TwoSidedMidpointMax}{$-2.0$}
+\newcommand{\MidpointChange}{$+0.5$ [$-1.1$, $+1.8$]}
+\newcommand{\BelowMidpointChange}{$+2.2$ [$+1.1$, $+3.4$]}
+\newcommand{\AboveMidpointChange}{$+0.5$ [$-0.7$, $+1.9$]}
+\newcommand{\LowerTailChange}{$+1.6$ [$+0.4$, $+2.8$]}
+\newcommand{\UpperChange}{$-2.4$ [$-5.3$, $+0.2$]}
+\newcommand{\OneSidedOpposeMin}{9\%}
+\newcommand{\OneSidedOpposeMax}{35\%}
+\newcommand{\OneSidedBelowMin}{$+0.8$}
+\newcommand{\OneSidedBelowMax}{$+1.0$}
+\newcommand{\OneSidedMidpointMin}{$+0.5$}
+\newcommand{\OneSidedMidpointMax}{$+0.8$}
+\newcommand{\OneSidedAboveMin}{$+0.3$}
+\newcommand{\OneSidedAboveMax}{$+1.1$}
+\newcommand{\TwoSidedMidpointMin}{$+0.3$}
+\newcommand{\TwoSidedMidpointMax}{$+0.6$}
+\newcommand{\WorldBelowMax}{$+1.5$}
 \newcommand{\TwoSidedTopFavour}{30\%}
-\newcommand{\TwoSidedTopOppose}{29\%}
-\newcommand{\TwoSidedAboveMax}{$+0.7$}
-\newcommand{\MeanFallBound}{3.8\%}
-\newcommand{\MeanRiseBound}{0.2\%}
-\newcommand{\MidpointDrop}{3.8}
-\newcommand{\CovariateShare}{44\%}
-\newcommand{\HierarchicalShare}{49\%}
+\newcommand{\OtherBlockMax}{2\%}
+\newcommand{\OtherBlockEndorsedMax}{15\%}
+\newcommand{\SuspectBlockMin}{58\%}
+\newcommand{\SuspectBlockMax}{94\%}
+\newcommand{\SuspectBlockEndorsedMin}{55\%}
+\newcommand{\SuspectBlockEndorsedMax}{65\%}

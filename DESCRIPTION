@@ -10,6 +10,7 @@ Depends: R (>= 4.6.0)
 Imports:
     coda,
     endorse,
+    foreign,
     ggplot2
 Suggests:
     lintr,

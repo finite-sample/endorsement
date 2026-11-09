@@ -1,32 +1,27 @@
-fit_model <- function(respondents, spec, iterations = 200000L, burn = 20000L, thin = 40L) {
+model_sample <- function(respondents, spec) {
+  stopifnot(spec %in% names(specifications))
+  if (spec == "clean") respondents[!respondents$interviewer %in% suspect_interviewers, ] else respondents
+}
+
+fit_model <- function(respondents, spec, iterations = 200000L, burn = 20000L, thin = 40L, cores = 3L) {
   stopifnot(
     spec %in% names(specifications), iterations > burn, burn >= 0, thin >= 1,
     all(c(iterations, burn, thin) %% 1 == 0), (iterations - burn) %% thin == 0
   )
+  respondents <- model_sample(respondents, spec)
   starts <- list(
     list(seed = 101, lambda = -0.5, omega2 = 0.05),
     list(seed = 102, lambda = 0, omega2 = 0.1),
     list(seed = 103, lambda = 0.5, omega2 = 0.5)
   )
-  lapply(starts, function(start) {
+  parallel::mclapply(starts, function(start) {
     set.seed(start$seed)
-    common <- list(
+    endorse::endorse(
       Y = model_questions(), data = respondents, identical.lambda = TRUE,
-      MCMC = iterations, burn = burn, thin = thin,
+      MCMC = iterations, burn = burn, thin = thin, covariates = FALSE, hierarchical = FALSE,
       lambda.start = start$lambda, omega2.start = start$omega2, verbose = FALSE
     )
-    extra <- switch(spec,
-      primary = list(covariates = FALSE, hierarchical = FALSE),
-      covariates = list(covariates = TRUE, formula.indiv = ~ female + rural + edu + inc, hierarchical = FALSE),
-      hierarchical = list(
-        covariates = FALSE, hierarchical = TRUE,
-        data.village = data.frame(division = sort(unique(respondents$division))),
-        village = "division", formula.village = ~1
-      )
-    )
-    message("Fitting ", spec, ", seed ", start$seed)
-    do.call(endorse::endorse, c(common, extra))
-  })
+  }, mc.cores = cores)
 }
 
 summarize_fits <- function(fits, spec) {
@@ -39,33 +34,9 @@ summarize_fits <- function(fits, spec) {
   lambda <- do.call(rbind, lapply(fits, function(fit) as.matrix(fit$lambda)))
   omega2 <- do.call(rbind, lapply(fits, function(fit) as.matrix(fit$omega2)))
   x_sd <- unlist(lapply(fits, function(fit) as.numeric(fit$x)))
-  n_draws <- nrow(lambda)
   n_groups <- length(endorsers)
-  mu <- p_positive <- matrix(NA_real_, n_draws, n_groups)
-  if (spec == "primary") {
-    mu <- lambda
-    p_positive <- pnorm(lambda / sqrt(omega2))
-  } else if (spec == "covariates") {
-    design <- fits[[1]]$model.matrix.indiv
-    for (group in seq_len(n_groups)) {
-      columns <- (group - 1L) * ncol(design) + seq_len(ncol(design))
-      for (first in seq(1L, n_draws, by = 500L)) {
-        index <- first:min(first + 499L, n_draws)
-        reactions <- design %*% t(lambda[index, columns, drop = FALSE])
-        mu[index, group] <- colMeans(reactions)
-        p_positive[index, group] <- colMeans(pnorm(sweep(reactions, 2, sqrt(omega2[index, group]), "/")))
-      }
-    }
-  } else {
-    division <- fits[[1]]$village.indicator
-    weights <- as.numeric(table(factor(division, levels = seq_len(max(division))))) / length(division)
-    for (group in seq_len(n_groups)) {
-      columns <- (group - 1L) * length(weights) + seq_along(weights)
-      reactions <- lambda[, columns, drop = FALSE]
-      mu[, group] <- as.numeric(reactions %*% weights)
-      p_positive[, group] <- as.numeric(pnorm(reactions / sqrt(omega2[, group])) %*% weights)
-    }
-  }
+  mu <- lambda
+  p_positive <- pnorm(lambda / sqrt(omega2))
   mu_standardized <- mu / x_sd
   omega_standardized <- sqrt(omega2) / x_sd
   summarize_draws <- function(draws, prefix) {

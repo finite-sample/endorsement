@@ -47,20 +47,59 @@ test_that("mixed-arm cluster covariance matches the full matrix sandwich", {
   expect_equal(clustered_ate_se(responses), sqrt(covariance[2, 2]))
 })
 
-test_that("empirical results survive the language migration", {
-  analysis <- analyze_responses(respondents, list())
-  expect_equal(length(analysis$control), 10619L)
-  expect_equal(length(analysis$treated), 10229L)
-  expect_equal(analysis$alpha, 0.735850833411809, tolerance = 1e-12)
-  expect_equal(analysis$beta, -0.012832943099950533, tolerance = 1e-12)
-  expect_equal(analysis$se, 0.00520879916129222, tolerance = 1e-12)
-  expect_equal(unname(analysis$bounds[c("lower", "upper")]),
-    c(0.011908176659755743, 0.5804689707128732),
+test_that("headline estimates exclude the three interviewers and match recorded values", {
+  analysis <- analyze_responses(respondents, list(), read.csv(file.path(root, "data", "questionnaire.csv")))
+  expect_equal(analysis$respondents, 5166L)
+  expect_equal(length(analysis$control), 10364L)
+  expect_equal(length(analysis$treated), 10300L)
+  expect_equal(analysis$alpha, 0.74628521806252346, tolerance = 1e-12)
+  expect_equal(analysis$beta, -0.020751237480000517, tolerance = 1e-12)
+  expect_equal(analysis$se, 0.0053202404833435557, tolerance = 1e-12)
+  expect_equal(analysis$se_interviewer, 0.0050953325263102161, tolerance = 1e-12)
+  expect_equal(analysis$summaries$ate[1:3], c(-0.012841191060277812, -0.020751237480000517, -0.028136735169026483),
     tolerance = 1e-12
   )
-  expect_equal(unname(analysis$anomalies), c(35, 94))
-  expect_equal(analysis$excluded, 129L)
-  expect_equal(analysis$clean_ate, -0.012719900088725256, tolerance = 1e-12)
+  expect_equal(unname(analysis$anomalies), c(34, 94))
+  expect_equal(analysis$screen$interviewer[analysis$screen$suspect], suspect_interviewers)
+  expect_true(all(analysis$screen$flagged[analysis$screen$suspect]))
+  effects <- analysis$effects
+  tested <- effects[effects$tested, ]
+  expect_setequal(tested$interviewer[order(-abs(tested$z))][1:2], c(37L, 71L))
+  expect_lt(attr(effects, "test")[["p"]], 0.01)
+  expect_gt(attr(effects, "test_without_suspects")[["p"]], 0.1)
+  expect_equal(analysis$matches$items, 92L)
+  expect_equal(sum(analysis$matches$duplicates$pairs), 79L)
+})
+
+test_that("clustered standard errors reduce to respondent clustering and grow with shared cluster shocks", {
+  responses <- reshape_responses(respondents)
+  expect_equal(clustered_ate_se(responses, responses$respondent), clustered_ate_se(responses))
+  set.seed(3)
+  shock <- stats::rnorm(20)
+  toy <- data.frame(
+    respondent = 1:400, interviewer = rep(1:20, each = 20),
+    endorser = rep(c("a", "b"), 200)
+  )
+  toy$response <- shock[toy$interviewer] * (toy$endorser == "b") + stats::rnorm(400, sd = 0.1)
+  expect_gt(clustered_ate_se(toy, toy$interviewer), 3 * clustered_ate_se(toy))
+})
+
+test_that("the screen flags an interviewer who records one answer string and spares the rest", {
+  set.seed(11)
+  n <- 600L
+  answer <- function() sample(1:5, n, replace = TRUE)
+  toy <- data.frame(
+    respondent = seq_len(n), province = "p", district = rep(c("d1", "d2"), each = n / 2),
+    interviewer = rep(1:6, each = n / 6), female = 0L, rural = 0L
+  )
+  for (column in response_columns()) toy[[column]] <- NA_integer_
+  for (policy in policies) toy[[paste(policy, "a", sep = ".")]] <- answer()
+  copied <- toy$interviewer == 2L
+  toy[copied, paste(policies, "a", sep = ".")] <- matrix(c(5L, 1L, 1L, 5L), sum(copied), 4L, byrow = TRUE)
+  for (column in response_columns()) toy[[column]] <- factor(toy[[column]], levels = 1:5)
+  screen <- interviewer_screen(toy, simulations = 200L)
+  expect_equal(screen$interviewer[screen$p < 0.01], 2L)
+  expect_equal(screen$pattern[screen$interviewer == 2L], "4004")
 })
 
 test_that("within-respondent moments separate shared reactions from independent noise", {
@@ -68,7 +107,8 @@ test_that("within-respondent moments separate shared reactions from independent 
     responses <- expand.grid(policy = policies, respondent = seq_len(nrow(values)), stringsAsFactors = FALSE)
     responses$response <- as.vector(t(values))
     responses$endorser <- codes[responses$respondent]
-    responses[, c("respondent", "policy", "endorser", "response")]
+    responses$interviewer <- responses$respondent
+    responses[, c("respondent", "interviewer", "policy", "endorser", "response")]
   }
   set.seed(7)
   n <- 400L
@@ -105,9 +145,10 @@ test_that("person-mean distributions are shares that sum to one in each arm", {
 test_that("simulated opposition alone moves mass through the midpoint without emptying it", {
   worlds <- reaction_worlds(reshape_responses(respondents), simulations = 100L)
   one_sided <- worlds[worlds$world == "Opposition only", ]
-  expect_true(all(abs(one_sided$midpoint) < 0.005))
+  expect_true(all(abs(one_sided$midpoint) < 0.01))
   expect_true(all(diff(one_sided$oppose) < 0))
   both <- worlds[worlds$world == "Both directions", ]
-  expect_true(all(diff(both$midpoint) < 0))
-  expect_lt(worlds$midpoint_upper[worlds$world == "Observed"], 0)
+  expect_lt(both$midpoint[3], both$midpoint[1])
+  expect_lt(worlds$midpoint_lower[worlds$world == "Observed"], 0)
+  expect_gt(worlds$midpoint_upper[worlds$world == "Observed"], 0)
 })
