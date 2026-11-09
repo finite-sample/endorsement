@@ -115,7 +115,7 @@ person_mean_distribution <- function(responses, draws = 2000L, seed = 1L) {
       difference = boot$difference, lower = boot$lower, upper = boot$upper
     ),
     bins = data.frame(
-      bin = c("$\\leq 0.375$", "0.4375", "0.5", "0.5625", "0.625", "0.6875--0.8125", "0.875--0.9375", "1"),
+      bin = c("$\\leq 6/16$", "7/16", "8/16", "9/16", "10/16", "11/16--13/16", "14/16--15/16", "16/16"),
       control = binned$control, treated = binned$treated,
       difference = binned$difference, lower = binned$lower, upper = binned$upper
     )

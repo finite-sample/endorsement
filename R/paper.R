@@ -17,7 +17,7 @@ write_tables <- function(analysis) {
   methods <- analysis$methods
   write_table(
     "method_comparison", c("Restriction", "Assumption", "Implied fraction"),
-    cbind(methods$restriction, methods$assumption, percent(methods$fraction, 1)), "lll"
+    cbind(methods$restriction, methods$assumption, percent(methods$fraction)), "lll"
   )
   moments <- analysis$moments
   write_table(
@@ -108,12 +108,12 @@ paper_numbers <- function(analysis) {
     StrongPairInterval = sprintf("[$%+.2f$, $%+.2f$]", strong$lower, strong$upper),
     WeakPairChangeMin = sprintf("%.2f", min(weak$difference)),
     WeakPairChangeMax = sprintf("%.2f", max(weak$difference)),
-    MidpointControl = percent(bin("0.5")$control, 1), MidpointEndorsed = percent(bin("0.5")$treated, 1),
-    MidpointChange = change(bin("0.5")), BelowMidpointChange = change(bin("0.4375")),
-    AboveMidpointChange = change(bin("0.5625")), NextAboveChange = change(bin("0.625")),
-    LowerTailChange = change(bin("$\\leq 0.375$")),
-    AllCeilingControl = percent(bin("1")$control, 1), AllCeilingChange = change(bin("1")),
-    TopThirdShare = percent(bin("0.875--0.9375")$control + bin("1")$control, 1)
+    MidpointControl = percent(bin("8/16")$control, 1), MidpointEndorsed = percent(bin("8/16")$treated, 1),
+    MidpointChange = change(bin("8/16")), BelowMidpointChange = change(bin("7/16")),
+    AboveMidpointChange = change(bin("9/16")), NextAboveChange = change(bin("10/16")),
+    LowerTailChange = change(bin("$\\leq 6/16$")),
+    AllCeilingControl = percent(bin("16/16")$control, 1), AllCeilingChange = change(bin("16/16")),
+    TopThirdShare = percent(bin("14/16--15/16")$control + bin("16/16")$control, 1)
   )
   worlds <- analysis$reaction_worlds
   one_sided <- worlds[worlds$world == "Opposition only", ]
@@ -134,7 +134,7 @@ paper_numbers <- function(analysis) {
     MeanFallBound = percent(max(0, gap), 1), MeanRiseBound = percent(max(0, -gap), 1)
   )
   values <- c(values,
-    MidpointDrop = number(-100 * analysis$person_means$bins$difference[analysis$person_means$bins$bin == "0.5"], 1)
+    MidpointDrop = number(-100 * analysis$person_means$bins$difference[analysis$person_means$bins$bin == "8/16"], 1)
   )
   for (spec in c("covariates", "hierarchical")) {
     posterior <- analysis$posteriors[[spec]]

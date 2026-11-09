@@ -99,7 +99,7 @@ test_that("person-mean distributions are shares that sum to one in each arm", {
     expect_true(all(table$lower <= table$upper))
   }
   expect_equal(nrow(distribution$full), 17L)
-  expect_equal(distribution$bins$control[distribution$bins$bin == "1"], distribution$full$control[17L])
+  expect_equal(distribution$bins$control[distribution$bins$bin == "16/16"], distribution$full$control[17L])
 })
 
 test_that("simulated opposition alone moves mass through the midpoint without emptying it", {
