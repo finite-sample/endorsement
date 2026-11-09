@@ -10,7 +10,7 @@ Blair et al. read small negative endorsement effects as evidence that Pakistanis
 
 <!-- BEGIN GENERATED RESULTS -->
 
-In the unweighted analysis sample of 5,212 respondents, endorsements lower stated policy support by -0.013 on the 0–1 scale (respondent-clustered SE 0.0052). That small average is the net of reactions in both directions, not the absence of reactions.
+In the unweighted analysis sample of 5,212 respondents, endorsements lower stated policy support by -0.013 on the 0–1 scale (respondent-clustered SE 0.005). That small average is the net of reactions in both directions, not the absence of reactions.
 
 - **Answers move together differently.** Under endorsement, the correlation between answers rises for five of six policy pairs (by 0.07 to 0.18) and falls for FCR and Durand (0.66 to 0.54).
 - **The midpoint empties in both directions.** Respondents whose four answers average the midpoint fall from 10.8% to 7.0%, with gains one step below and one step above.

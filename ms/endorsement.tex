@@ -60,7 +60,7 @@ I use the analysis file supplied with the \texttt{endorse} R package \citep{shir
 % Original weighting and estimates: Blair et al. (2013), survey design, footnote 31, Table 1.
 The analysis is unweighted. Blair et al. use population and policy weights; their survey oversampled Balochistan and Khyber Pakhtunkhwa. Their unconditional Table 1 has 5,358 respondents and a control mean of 0.796. Differences from the present estimates can reflect sample selection and policy weighting as well as population weighting. The estimates below therefore describe the analysis sample, not nationally representative prevalence.
 
-The package sample also retains assignment patterns excluded by the original replication code: \MixedCount{} respondents have control and endorsed items across policies, and \RepeatedCount{} receive the same endorser on multiple policies. Excluding these \AnomalyCount{} respondents changes the pooled ATE from $\PooledATEPrecise{}$ to $\CleanATE{}$. This diagnostic leaves the sign and rounded magnitude intact. The Bayesian models retain the package sample; their sensitivity to these exclusions has not been estimated.
+The package sample also retains assignment patterns excluded by the original replication code: \MixedCount{} respondents have control and endorsed items across policies, and \RepeatedCount{} receive the same endorser on multiple policies. Excluding these \AnomalyCount{} respondents leaves the pooled ATE at $\CleanATE{}$, the same to three decimals as in the full sample. The Bayesian models retain the package sample; their sensitivity to these exclusions has not been estimated.
 
 \section{Within-Respondent Patterns}
 \label{sec:within}

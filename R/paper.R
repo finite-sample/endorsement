@@ -78,7 +78,7 @@ paper_numbers <- function(analysis) {
     SampleSize = count(analysis$respondents), ControlCount = count(length(analysis$control)),
     TreatmentCount = count(length(analysis$treated)), BaselineMean = number(analysis$alpha),
     PooledATE = number(analysis$beta), PooledATEPoints = number(-100 * analysis$beta, 1),
-    PooledATEPrecise = number(analysis$beta, 5), PooledSE = number(analysis$se, 4),
+    PooledSE = number(analysis$se),
     TreatmentMean = number(mean(analysis$treated)), PrimaryShare = percent(average$p_mean),
     PrimaryInterval = range(average),
     MaxMeanReaction = number(max(abs(primary$mu_mean[primary$group != "Average"])), 2),
@@ -91,7 +91,7 @@ paper_numbers <- function(analysis) {
     LowerBound = percent(bounds[["lower"]]),
     UpperBound = percent(bounds[["upper"]]), MixedCount = as.character(analysis$anomalies[["mixed"]]),
     RepeatedCount = as.character(analysis$anomalies[["repeated"]]), AnomalyCount = as.character(analysis$excluded),
-    CleanATE = number(analysis$clean_ate, 5)
+    CleanATE = number(analysis$clean_ate)
   )
   points <- function(value) sprintf("%+.1f", 100 * value)
   change <- function(row) {
