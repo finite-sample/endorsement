@@ -1,9 +1,9 @@
 interval <- function(posterior) paste0("[", fmt(posterior$p_lo, "percent"), ", ", fmt(posterior$p_hi, "percent"), "]")
 points <- function(value) fmt(value, "points", signed = TRUE)
 
-write_table <- function(name, headings, rows, align, breaks = integer()) {
+write_table <- function(name, headings, rows, align, breaks = integer(), separator = "\\midrule") {
   body <- unlist(lapply(seq_len(nrow(rows)), function(index) {
-    c(if (index %in% breaks) "\\midrule", paste0(paste(rows[index, ], collapse = " & "), " \\\\"))
+    c(if (index %in% breaks) separator, paste0(paste(rows[index, ], collapse = " & "), " \\\\"))
   }))
   writeLines(c(
     paste0("\\begin{tabular}{", align, "}"), "\\toprule",
@@ -14,25 +14,26 @@ write_table <- function(name, headings, rows, align, breaks = integer()) {
 
 write_tables <- function(analysis) {
   summaries <- analysis$summaries
-  change <- function(name) {
-    paste0(
-      points(summaries[[name]]), " [", points(summaries[[paste0(name, "_lower")]]), ", ",
-      points(summaries[[paste0(name, "_upper")]]), "]"
-    )
+  bounds <- function(name) {
+    paste0("[", points(summaries[[paste0(name, "_lower")]]), ", ", points(summaries[[paste0(name, "_upper")]]), "]")
   }
+  changes <- c("midpoint", "above", "below")
+  estimates <- cbind(
+    c("All interviews", "Without 7, 37, 71", "Without flagged", "Without 7, 37, 71, duplicating"),
+    count(summaries$respondents), summaries$interviewers, paste0("$", fmt(summaries$ate, "scale"), "$"),
+    sapply(changes, function(name) points(summaries[[name]]))
+  )
+  uncertainty <- cbind("", "", "", paste0("(", fmt(summaries$se_interviewer, "scale"), ")"), sapply(changes, bounds))
+  # Estimates and their uncertainty on separate lines keep the table at the body font size.
+  rows <- do.call(rbind, lapply(seq_len(nrow(estimates)), function(index) {
+    rbind(estimates[index, ], uncertainty[index, ])
+  }))
   write_table(
     "interviewer_samples", c(
       "Sample", "Respondents", "Interviewers", "Average effect", "Midpoint (pp)", "One above (pp)",
       "One below (pp)"
     ),
-    cbind(
-      c(
-        "All interviews", "Without 7, 37, 71", "Without flagged", "Without 7, 37, 71, duplicating"
-      ),
-      count(summaries$respondents), summaries$interviewers,
-      paste0("$", fmt(summaries$ate, "scale"), "$ (", fmt(summaries$se_interviewer, "scale"), ")"),
-      change("midpoint"), change("above"), change("below")
-    ), "lrrrrrr"
+    rows, "lrrrrrr", breaks = c(3L, 5L, 7L), separator = "\\addlinespace"
   )
   effects <- analysis$effects
   top <- effects[effects$tested, ]
