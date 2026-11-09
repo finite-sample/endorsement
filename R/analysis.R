@@ -342,7 +342,8 @@ sample_summary <- function(respondents, draws = 1000L, seed = 1L) {
     respondents = nrow(respondents), interviewers = length(unique(respondents$interviewer)),
     ate = mean(responses$response[treated]) - mean(responses$response[!treated]),
     se_respondent = clustered_ate_se(responses), se_interviewer = clustered_ate_se(responses, responses$interviewer),
-    below = boot$difference[["below"]], midpoint = boot$difference[["midpoint"]],
+    below = boot$difference[["below"]], below_lower = boot$lower[["below"]], below_upper = boot$upper[["below"]],
+    midpoint = boot$difference[["midpoint"]],
     midpoint_lower = boot$lower[["midpoint"]], midpoint_upper = boot$upper[["midpoint"]],
     above = boot$difference[["above"]], above_lower = boot$lower[["above"]], above_upper = boot$upper[["above"]],
     correlations_rising = sum(correlation_change[upper.tri(correlation_change)] > 0)

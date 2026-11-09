@@ -27,12 +27,11 @@ write_tables <- function(analysis) {
     ),
     cbind(
       c(
-        "All interviews", "Without interviewers 7, 37, 71", "Without all flagged interviewers",
-        "Without 7, 37, 71 and duplicating interviewers"
+        "All interviews", "Without 7, 37, 71", "Without flagged", "Without 7, 37, 71, duplicating"
       ),
       count(summaries$respondents), summaries$interviewers,
       paste0("$", fmt(summaries$ate, "scale"), "$ (", fmt(summaries$se_interviewer, "scale"), ")"),
-      change("midpoint"), change("above"), points(summaries$below)
+      change("midpoint"), change("above"), change("below")
     ), "lrrrrrr"
   )
   effects <- analysis$effects
@@ -285,6 +284,7 @@ paper_numbers <- function(analysis) {
     HeterogeneityDFClean = as.character(without[["df"]]),
     HeterogeneityPClean = fmt(without[["p"]], "p"),
     ZeroVarianceCount = as.character(attr(effects, "zero_variance")),
+    SuspectVolumeRanks = paste(sort(rank(-screen$interviews, ties.method = "min")[screen$suspect]), collapse = ", "),
     SuspectZRanks = paste(sort(z_rank), collapse = ", "), SuspectShiftRanks = paste(sort(shift_rank), collapse = ", "),
     SuspectEffectMin = points(min(effects$effect[effects$interviewer %in% suspect_interviewers])),
     SuspectEffectMax = points(max(effects$effect[effects$interviewer %in% suspect_interviewers])),
@@ -343,7 +343,8 @@ write_readme_results <- function(values) {
     paste0(
       "- **Without the three interviewers,** the measurement model's share of favorable reactions falls from ",
       value("FullPrimaryShare"), " to ", value("PrimaryShare"), ", the effect is ", value("PooledATE"),
-      " (SE ", value("PooledInterviewerSE"), "), and respondents leave the middle of the scale only downward."
+      " (SE ", value("PooledInterviewerSE"), "), and the apparent movement out of the middle of the scale ",
+      "in both directions disappears."
     ),
     paste0(
       "- **How many respondents react favorably is not identified by the data.** The model's share rests on its ",
