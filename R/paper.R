@@ -77,7 +77,8 @@ paper_numbers <- function(analysis) {
   values <- c(
     SampleSize = count(analysis$respondents), ControlCount = count(length(analysis$control)),
     TreatmentCount = count(length(analysis$treated)), BaselineMean = number(analysis$alpha),
-    PooledATE = number(analysis$beta), PooledATEPrecise = number(analysis$beta, 5), PooledSE = number(analysis$se, 4),
+    PooledATE = number(analysis$beta), PooledATEPoints = number(-100 * analysis$beta, 1),
+    PooledATEPrecise = number(analysis$beta, 5), PooledSE = number(analysis$se, 4),
     TreatmentMean = number(mean(analysis$treated)), PrimaryShare = percent(average$p_mean),
     PrimaryInterval = range(average),
     MaxMeanReaction = number(max(abs(primary$mu_mean[primary$group != "Average"])), 2),
