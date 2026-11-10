@@ -298,7 +298,6 @@ paper_numbers <- function(analysis) {
     CeilingShare = fmt(tail(analysis$control_distribution, 1), "percent"),
     DiscreteOneShare = fmt(analysis$discrete$fraction[1], "percent"),
     LowerBound = fmt(bounds[["lower"]], "percent"), UpperBound = fmt(bounds[["upper"]], "percent"),
-    MixedCount = as.character(analysis$anomalies[["mixed"]]),
     RepeatedCount = as.character(analysis$anomalies[["repeated"]]), AnomalyCount = as.character(analysis$excluded),
     CleanATE = fmt(analysis$clean_ate, "scale")
   )
@@ -316,6 +315,7 @@ paper_numbers <- function(analysis) {
   without <- attr(effects, "test_without_suspects")
   reshuffled <- attr(effects, "permutation")
   reshuffled_without <- attr(effects, "permutation_without_suspects")
+  with_mixed <- analysis$effects_with_mixed
   stopifnot(isTRUE(all.equal(reshuffled[["statistic"]], test[["statistic"]], check.names = FALSE)))
   blocks <- analysis$blocks
   switch <- analysis$switch
@@ -328,11 +328,17 @@ paper_numbers <- function(analysis) {
   unduplicated <- summaries[summaries$sample == "unduplicated", ]
   values <- c(values,
     HeterogeneityStat = fmt(test[["statistic"]], "statistic"), HeterogeneityDF = as.character(test[["df"]]),
-    HeterogeneityChiP = fmt(test[["p"]], "p"), HeterogeneityTested = as.character(nrow(tested)),
-    HeterogeneityP = fmt(reshuffled[["p"]], "p"), HeterogeneityPermutations = count(reshuffled[["permutations"]]),
+    HeterogeneityChiP = p_relation(test[["p"]]), HeterogeneityTested = as.character(nrow(tested)),
+    HeterogeneityP = p_relation(reshuffled[["p"]]), HeterogeneityPermutations = count(reshuffled[["permutations"]]),
     HeterogeneityStatClean = fmt(without[["statistic"]], "statistic"),
     HeterogeneityDFClean = as.character(without[["df"]]),
-    HeterogeneityPClean = fmt(reshuffled_without[["p"]], "p"),
+    HeterogeneityPClean = p_relation(reshuffled_without[["p"]]),
+    MixedRespondents = as.character(analysis$mixed),
+    HeterogeneityStatMixed = fmt(attr(with_mixed, "test")[["statistic"]], "statistic"),
+    HeterogeneityPMixed = p_relation(attr(with_mixed, "permutation")[["p"]]),
+    SuspectSEMixedRatio = fmt(
+      with_mixed$se[with_mixed$interviewer == 71L] / effects$se[effects$interviewer == 71L] - 1, "respondents"
+    ),
     ZeroVarianceCount = as.character(attr(effects, "zero_variance")),
     SuspectVolumeRanks = paste(sort(rank(-screen$interviews, ties.method = "min")[screen$suspect]), collapse = ", "),
     SuspectZRanks = paste(sort(z_rank), collapse = ", "), SuspectShiftRanks = paste(sort(shift_rank), collapse = ", "),

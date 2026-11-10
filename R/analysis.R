@@ -305,7 +305,7 @@ interviewer_effects <- function(responses, minimum = 20L) {
 # answers, so the reshuffled effects differ across interviewers only by chance. Effects and standard errors are
 # recomputed exactly as for the observed data. This reference does not rely on the chi-square approximation,
 # which understates Q's spread when interviewers have few respondents per version.
-heterogeneity_permutation <- function(responses, interviewers, permutations = 4999L, seed = 1L) {
+heterogeneity_permutation <- function(responses, interviewers, permutations = 19999L, seed = 1L) {
   set.seed(seed)
   cells <- lapply(interviewers, function(id) {
     own <- responses[responses$interviewer == id, ]
@@ -480,6 +480,10 @@ analyze_responses <- function(respondents, posteriors, questionnaire = read.csv(
     unflagged = respondents[!respondents$interviewer %in% flagged, ],
     unduplicated = respondents[!respondents$interviewer %in% c(suspect_interviewers, duplicated), ]
   )
+  # Interviewer effects compare respondents who saw one version; the few recorded with both belong to neither arm.
+  full_responses <- reshape_responses(samples$full)
+  mixed <- assignment_anomalies(samples$full)$mixed
+  single_version <- full_responses[!full_responses$respondent %in% which(mixed), ]
   summaries <- do.call(rbind, lapply(names(samples), function(name) {
     cbind(sample = name, sample_summary(samples[[name]]))
   }))
@@ -517,7 +521,8 @@ analyze_responses <- function(respondents, posteriors, questionnaire = read.csv(
   list(
     screen = screen, midpoint_counts = midpoint_counts(samples$full), summaries = summaries,
     blocks = block_test(samples$full), switch = arm_switch_test(samples$full),
-    effects = interviewer_effects(reshape_responses(samples$full)), matches = matches,
+    effects = interviewer_effects(single_version), effects_with_mixed = interviewer_effects(full_responses),
+    mixed = sum(mixed), matches = matches,
     respondents = nrow(respondents), responses = responses, control = control, treated = treated,
     alpha = alpha, beta = beta, se = clustered_ate_se(responses),
     se_interviewer = clustered_ate_se(responses, responses$interviewer), control_distribution = control_distribution,

@@ -7,6 +7,8 @@ test_that("each kind of quantity prints at its configured precision", {
   expect_identical(fmt(-0.0004, "points", signed = TRUE), "$0.0$")
   expect_error(fmt(0.0004, "p"), "inequality")
   expect_error(fmt(NA_real_, "percent"), "Missing")
+  expect_identical(p_relation(0.0183), "=0.018")
+  expect_identical(p_relation(8e-6), "<0.001")
 })
 
 test_that("only the formatter chooses decimal places", {

@@ -27,3 +27,9 @@ fmt <- function(x, kind, signed = FALSE) {
 }
 
 count <- function(x) format(x, big.mark = ",", scientific = FALSE, trim = TRUE)
+
+# A p-value written with its relation, so that one too small for the configured precision prints as a bound.
+p_relation <- function(p) {
+  floor <- 10^-precision[["p"]]
+  if (p < floor) paste0("<", fmt(floor, "p")) else paste0("=", fmt(p, "p"))
+}
