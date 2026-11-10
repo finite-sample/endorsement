@@ -15,7 +15,7 @@ Blair et al. read a small negative endorsement effect as evidence that Pakistani
 Three of the survey's 75 interviewers (5.7% of interviews) recorded one answer pattern in most of their interviews. Their interviews make respondents look warmer toward militant groups and produce the apparent movement in both directions that the published data show.
 
 - **With all interviews,** endorsements lower policy support by -0.013 on the 0–1 scale (interviewer-clustered SE 0.007).
-- **Without the three interviewers,** the measurement model's share of favorable reactions falls from 43% to 38%, the effect is -0.021 (SE 0.005), and the apparent movement out of the middle of the scale in both directions disappears.
+- **Without the three interviewers,** the effect is -0.021 (SE 0.005), the apparent movement out of the middle of the scale in both directions disappears, and the measurement model's share of favorable reactions moves from 43% to 38%, within the uncertainty of either estimate.
 - **How many respondents react favorably is not identified by the data.** The model's share rests on its assumption that reactions are normally distributed.
 
 <!-- END GENERATED RESULTS -->

@@ -193,6 +193,46 @@ write_interviewer_figure <- function(screen, path = "figs/interviewers.pdf") {
   invisible(path)
 }
 
+# Each interviewer's distance between the answer patterns of the two versions, against the middle 95% of
+# distances from reshuffled version labels.
+write_switch_figure <- function(switch, path = "figs/arm_switch.pdf") {
+  accent <- "#c2410c"
+  muted <- "#8a8984"
+  # Each interviewer is centred on their own median reshuffled share, because small interviewers have high
+  # shares by chance and would otherwise dominate the picture.
+  switch$excess <- 100 * (switch$distance - switch$middle)
+  switch$order <- rank(switch$excess, ties.method = "first")
+  switch$group <- ifelse(switch$suspect, "suspect", "other")
+  suspects <- switch[switch$suspect, ]
+  plot <- ggplot2::ggplot(switch, ggplot2::aes(order)) +
+    ggplot2::geom_hline(yintercept = 0, colour = muted, linewidth = 0.3) +
+    ggplot2::geom_linerange(
+      ggplot2::aes(ymin = 100 * (lower - middle), ymax = 100 * (upper - middle)),
+      colour = "#d6d5d0", linewidth = 1.6
+    ) +
+    ggplot2::geom_point(ggplot2::aes(y = excess, colour = group), size = 1.5) +
+    ggplot2::annotate("text",
+      x = min(suspects$order) - 1, y = mean(suspects$excess),
+      label = paste("Interviewers", paste(sort(suspects$interviewer), collapse = ", ")), hjust = 1, colour = accent,
+      size = 2.8
+    ) +
+    ggplot2::scale_colour_manual(values = c(other = "#4a4a48", suspect = accent)) +
+    ggplot2::labs(
+      x = "Interviewers, ordered by observed minus median reshuffled share",
+      y = "Observed minus median\nreshuffled share (points)"
+    ) +
+    ggplot2::theme_minimal(base_size = 9) +
+    ggplot2::theme(
+      panel.grid.minor = ggplot2::element_blank(), panel.grid.major.x = ggplot2::element_blank(),
+      legend.position = "none", axis.text = ggplot2::element_text(colour = muted),
+      axis.title = ggplot2::element_text(colour = muted)
+    )
+  grDevices::pdf(path, width = 7.5, height = 3, useDingbats = FALSE)
+  print(plot)
+  grDevices::dev.off()
+  invisible(path)
+}
+
 paper_numbers <- function(analysis) {
   summaries <- analysis$summaries
   full <- summaries[summaries$sample == "full", ]
@@ -274,16 +314,25 @@ paper_numbers <- function(analysis) {
   tested <- effects[effects$tested, ]
   test <- attr(effects, "test")
   without <- attr(effects, "test_without_suspects")
+  reshuffled <- attr(effects, "permutation")
+  reshuffled_without <- attr(effects, "permutation_without_suspects")
+  stopifnot(isTRUE(all.equal(reshuffled[["statistic"]], test[["statistic"]], check.names = FALSE)))
+  blocks <- analysis$blocks
+  switch <- analysis$switch
+  switch_others <- switch[!switch$suspect & switch$p_family < 0.05, ]
+  nearby <- attr(blocks, "nearby")
+  bonferroni <- max(blocks$log10_p) + log10(attr(blocks, "searched"))
   z_rank <- rank(-abs(tested$z))[match(suspect_interviewers, tested$interviewer)]
   shift_rank <- rank(-abs(effects$shift))[match(suspect_interviewers, effects$interviewer)]
   matches <- analysis$matches
   unduplicated <- summaries[summaries$sample == "unduplicated", ]
   values <- c(values,
     HeterogeneityStat = fmt(test[["statistic"]], "statistic"), HeterogeneityDF = as.character(test[["df"]]),
-    HeterogeneityP = fmt(test[["p"]], "p"), HeterogeneityTested = as.character(nrow(tested)),
+    HeterogeneityChiP = fmt(test[["p"]], "p"), HeterogeneityTested = as.character(nrow(tested)),
+    HeterogeneityP = fmt(reshuffled[["p"]], "p"), HeterogeneityPermutations = count(reshuffled[["permutations"]]),
     HeterogeneityStatClean = fmt(without[["statistic"]], "statistic"),
     HeterogeneityDFClean = as.character(without[["df"]]),
-    HeterogeneityPClean = fmt(without[["p"]], "p"),
+    HeterogeneityPClean = fmt(reshuffled_without[["p"]], "p"),
     ZeroVarianceCount = as.character(attr(effects, "zero_variance")),
     SuspectVolumeRanks = paste(sort(rank(-screen$interviews, ties.method = "min")[screen$suspect]), collapse = ", "),
     SuspectZRanks = paste(sort(z_rank), collapse = ", "), SuspectShiftRanks = paste(sort(shift_rank), collapse = ", "),
@@ -296,7 +345,20 @@ paper_numbers <- function(analysis) {
     DuplicatingInterviewers = as.character(nrow(matches$duplicates)),
     TopDuplicators = paste(head(matches$duplicates$interviewer[order(-matches$duplicates$pairs)], 3), collapse = ", "),
     TopDuplicatorPairs = paste(head(sort(matches$duplicates$pairs, decreasing = TRUE), 3), collapse = ", "),
-    UnduplicatedATE = fmt(unduplicated$ate, "scale"), UnduplicatedSampleSize = count(unduplicated$respondents)
+    UnduplicatedATE = fmt(unduplicated$ate, "scale"), UnduplicatedSampleSize = count(unduplicated$respondents),
+    BlockNearbyInterviews = count(nearby[["interviews"]]),
+    BlockNearbyMatches = if (nearby[["matches"]] == 0) "none" else count(nearby[["matches"]]),
+    BlockSurveyRate = fmt(attr(blocks, "survey_rate"), "respondents"),
+    BlockSearched = count(attr(blocks, "searched")),
+    BlockLogBound = as.character(floor(-max(blocks$log10_p))),
+    BlockBonferroniBound = as.character(floor(-bonferroni)),
+    SwitchTested = as.character(nrow(switch)), SwitchPermutations = count(attr(switch, "permutations")),
+    # The three's p-values sit at the reshuffling floor, so the family-wise value is reported as a bound.
+    SwitchFamilyP = fmt(ceiling(1000 * max(switch$p_family[switch$suspect])) / 1000, "p"),
+    SwitchOthers = paste(sort(switch_others$interviewer), collapse = " and "),
+    SwitchOthersModalMax = fmt(max(switch_others$modal), "percent"),
+    SwitchSuspectModalMin = fmt(min(switch$modal[switch$suspect]), "percent"),
+    SwitchOtherShare = fmt(mean(switch$p[!switch$suspect] < 0.05), "percent")
   )
   values <- c(values,
     CorrelationsRising = as.character(nrow(rising)),
@@ -342,10 +404,10 @@ write_readme_results <- function(values) {
       "(interviewer-clustered SE ", value("FullSE"), ")."
     ),
     paste0(
-      "- **Without the three interviewers,** the measurement model's share of favorable reactions falls from ",
-      value("FullPrimaryShare"), " to ", value("PrimaryShare"), ", the effect is ", value("PooledATE"),
-      " (SE ", value("PooledInterviewerSE"), "), and the apparent movement out of the middle of the scale ",
-      "in both directions disappears."
+      "- **Without the three interviewers,** the effect is ", value("PooledATE"), " (SE ",
+      value("PooledInterviewerSE"), "), the apparent movement out of the middle of the scale in both directions ",
+      "disappears, and the measurement model's share of favorable reactions moves from ", value("FullPrimaryShare"),
+      " to ", value("PrimaryShare"), ", within the uncertainty of either estimate."
     ),
     paste0(
       "- **How many respondents react favorably is not identified by the data.** The model's share rests on its ",
@@ -363,6 +425,7 @@ write_paper <- function(analysis) {
   dir.create("tabs", showWarnings = FALSE)
   write_tables(analysis)
   write_interviewer_figure(analysis$screen)
+  write_switch_figure(analysis$switch)
   values <- paper_numbers(analysis)
   writeLines(paste0("\\newcommand{\\", names(values), "}{", values, "}"), "tabs/numbers.tex")
   write_readme_results(values)

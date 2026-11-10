@@ -67,6 +67,18 @@ test_that("headline estimates exclude the three interviewers and match recorded 
   expect_setequal(tested$interviewer[order(-abs(tested$z))][1:2], c(37L, 71L))
   expect_lt(attr(effects, "test")[["p"]], 0.01)
   expect_gt(attr(effects, "test_without_suspects")[["p"]], 0.1)
+  expect_equal(attr(effects, "permutation")[["statistic"]], attr(effects, "test")[["statistic"]], ignore_attr = TRUE)
+  expect_lt(attr(effects, "permutation")[["p"]], 0.05)
+  expect_gt(attr(effects, "permutation_without_suspects")[["p"]], 0.1)
+  # The text says no reshuffle reached the three, and that the other interviewers outside every reshuffle have
+  # diffuse answers that move down under endorsement.
+  switch <- analysis$switch
+  floor <- 1 / (1 + attr(switch, "permutations"))
+  expect_true(all(switch$p[switch$suspect] == floor))
+  others <- switch[!switch$suspect & switch$p_family < 0.05, ]
+  expect_true(all(others$change < 0))
+  expect_lt(max(others$modal), min(switch$modal[switch$suspect]))
+  expect_lt(max(analysis$blocks$log10_p), -10)
   expect_equal(analysis$matches$items, 92L)
   expect_equal(sum(analysis$matches$duplicates$pairs), 79L)
 })
@@ -151,4 +163,48 @@ test_that("simulated opposition alone moves mass through the midpoint without em
   expect_lt(both$midpoint[3], both$midpoint[1])
   expect_lt(worlds$midpoint_lower[worlds$world == "Observed"], 0)
   expect_gt(worlds$midpoint_upper[worlds$world == "Observed"], 0)
+})
+
+toy_survey <- function(seed, effect = rep(0, 6)) {
+  set.seed(seed)
+  n <- 600L
+  toy <- data.frame(
+    respondent = seq_len(n), province = "p", district = rep(c("d1", "d2"), each = n / 2),
+    interviewer = rep(1:6, each = n / 6), female = 0L, rural = 0L
+  )
+  for (column in response_columns()) toy[[column]] <- NA_integer_
+  endorsed <- as.logical(stats::ave(seq_len(n), toy$interviewer, FUN = function(rows) sample(seq_along(rows)) %% 2))
+  values <- matrix(sample(1:5, 4L * n, replace = TRUE), n, 4L)
+  values[] <- pmin(5L, pmax(1L, values + round(effect[toy$interviewer] * endorsed)))
+  list(toy = toy, endorsed = endorsed, values = values)
+}
+
+fill_survey <- function(survey) {
+  toy <- survey$toy
+  for (index in seq_along(policies)) {
+    toy[[paste(policies[index], "a", sep = ".")]][!survey$endorsed] <- survey$values[!survey$endorsed, index]
+    for (code in names(endorsers)) {
+      rows <- survey$endorsed & names(endorsers)[seq_along(survey$endorsed) %% length(endorsers) + 1L] == code
+      toy[[paste(policies[index], code, sep = ".")]][rows] <- survey$values[rows, index]
+    }
+  }
+  for (column in response_columns()) toy[[column]] <- factor(toy[[column]], levels = 1:5)
+  toy
+}
+
+test_that("the version-switch test singles out an interviewer whose block moves with the version", {
+  survey <- toy_survey(5)
+  copied <- survey$toy$interviewer == 2L
+  block <- function(rows, pattern) matrix(pattern, sum(rows), 4L, byrow = TRUE)
+  survey$values[copied & !survey$endorsed, ] <- block(copied & !survey$endorsed, c(5L, 1L, 1L, 5L))
+  survey$values[copied & survey$endorsed, ] <- block(copied & survey$endorsed, c(5L, 2L, 1L, 5L))
+  switch <- arm_switch_test(fill_survey(survey), permutations = 499L)
+  expect_equal(switch$interviewer[switch$p_family < 0.05], 2L)
+})
+
+test_that("the reshuffled Q rejects an interviewer-specific effect and not a common one", {
+  common <- reshape_responses(fill_survey(toy_survey(6, effect = rep(-1, 6))))
+  planted <- reshape_responses(fill_survey(toy_survey(6, effect = c(-1, -1, 2, -1, -1, -1))))
+  expect_gt(heterogeneity_permutation(common, 1:6, permutations = 499L)[["p"]], 0.05)
+  expect_lt(heterogeneity_permutation(planted, 1:6, permutations = 499L)[["p"]], 0.01)
 })

@@ -292,8 +292,128 @@ interviewer_effects <- function(responses, minimum = 20L) {
   }
   attr(effects, "test") <- test(tested)
   attr(effects, "test_without_suspects") <- test(tested & !effects$interviewer %in% suspect_interviewers)
+  attr(effects, "permutation") <- heterogeneity_permutation(responses, effects$interviewer[tested], seed = 1L)
+  attr(effects, "permutation_without_suspects") <- heterogeneity_permutation(
+    responses, effects$interviewer[tested & !effects$interviewer %in% suspect_interviewers], seed = 2L
+  )
   attr(effects, "zero_variance") <- sum(effects$se == 0, na.rm = TRUE)
   effects
+}
+
+# Cochran's Q against reshuffles of the randomized version labels. Each respondent's set of four labels moves
+# as a unit to another respondent of the same interviewer, after the common effect is removed from endorsed
+# answers, so the reshuffled effects differ across interviewers only by chance. Effects and standard errors are
+# recomputed exactly as for the observed data. This reference does not rely on the chi-square approximation,
+# which understates Q's spread when interviewers have few respondents per version.
+heterogeneity_permutation <- function(responses, interviewers, permutations = 4999L, seed = 1L) {
+  set.seed(seed)
+  cells <- lapply(interviewers, function(id) {
+    own <- responses[responses$interviewer == id, ]
+    own <- own[order(own$respondent, own$policy), ]
+    treated <- matrix(own$endorser != "a", ncol = length(policies), byrow = TRUE)
+    answers <- matrix(own$response, ncol = length(policies), byrow = TRUE)
+    list(answers = answers, treated = treated)
+  })
+  draw <- function(cell, labels) {
+    n_treated <- sum(cell$treated)
+    n_control <- length(cell$treated) - n_treated
+    pieces <- lapply(seq_len(ncol(cell$answers)), function(item) {
+      list(y = cell$answers[, item], t = matrix(cell$treated[, item][labels], nrow = nrow(labels)))
+    })
+    treated_sum <- Reduce(`+`, lapply(pieces, function(piece) colSums(piece$y * piece$t)))
+    treated_mean <- treated_sum / n_treated
+    control_mean <- (sum(cell$answers) - treated_sum) / n_control
+    score <- Reduce(`+`, lapply(pieces, function(piece) {
+      piece$t * outer(piece$y, treated_mean, "-") / n_treated -
+        (1 - piece$t) * outer(piece$y, control_mean, "-") / n_control
+    }))
+    list(effect = treated_mean - control_mean, se = sqrt(colSums(score^2)))
+  }
+  q <- function(effect, se) {
+    weight <- 1 / se^2
+    centre <- colSums(weight * effect) / colSums(weight)
+    statistic <- colSums(weight * sweep(effect, 2, centre)^2)
+    statistic[colSums(se == 0) > 0] <- Inf
+    statistic
+  }
+  observed <- lapply(cells, function(cell) draw(cell, matrix(seq_len(nrow(cell$answers)))))
+  effect <- matrix(sapply(observed, `[[`, "effect"), ncol = 1L)
+  se <- matrix(sapply(observed, `[[`, "se"), ncol = 1L)
+  statistic <- q(effect, se)
+  centre <- sum(effect / se^2) / sum(1 / se^2)
+  null <- lapply(cells, function(cell) {
+    cell$answers <- cell$answers - centre * cell$treated
+    draw(cell, replicate(permutations, sample.int(nrow(cell$answers))))
+  })
+  reshuffled <- q(t(sapply(null, `[[`, "effect")), t(sapply(null, `[[`, "se")))
+  c(statistic = statistic, permutations = permutations, p = (1 + sum(reshuffled >= statistic)) / (1 + permutations))
+}
+
+# How often each of the three recorded the 4-0-0-4 block without endorsements and 4-1-0-4 with them, against
+# the rate among other interviewers' respondents in the same districts and version. One match is added to each
+# comparison group so that no rate is zero. The binomial tail treats respondents as independent.
+block_test <- function(respondents) {
+  answers <- respondent_answers(respondents)
+  others <- answers[!answers$interviewer %in% suspect_interviewers, ]
+  cases <- expand.grid(interviewer = suspect_interviewers, arm = c("control", "endorsed"), stringsAsFactors = FALSE)
+  cases$pattern <- ifelse(cases$arm == "control", "4004", "4104")
+  rows <- lapply(seq_len(nrow(cases)), function(index) {
+    case <- cases[index, ]
+    own <- answers[answers$interviewer == case$interviewer & answers$arm == case$arm, ]
+    comparison <- others$pattern[others$district %in% own$district & others$arm == case$arm]
+    recorded <- sum(own$pattern == case$pattern)
+    rate <- (sum(comparison == case$pattern) + 1) / (length(comparison) + 1)
+    cbind(case,
+      recorded = recorded, interviews = nrow(own), comparison = length(comparison),
+      matches = sum(comparison == case$pattern),
+      log10_p = stats::pbinom(recorded - 1L, nrow(own), rate, lower.tail = FALSE, log.p = TRUE) / log(10)
+    )
+  })
+  tests <- do.call(rbind, rows)
+  districts <- unique(answers$district[answers$interviewer %in% suspect_interviewers & answers$arm == "control"])
+  nearby <- others$pattern[others$district %in% districts & others$arm == "control"]
+  # Five answer options on each of four policies, two versions, every interviewer.
+  attr(tests, "searched") <- 5^length(policies) * 2 * length(unique(answers$interviewer))
+  attr(tests, "nearby") <- c(interviews = length(nearby), matches = sum(nearby == "4004"))
+  attr(tests, "survey_rate") <- mean(others$pattern[others$arm == "control"] == "4004")
+  tests
+}
+
+# Within each interviewer, how different the answer patterns of the two versions are, against reshuffles of the
+# randomized version labels. The distance is the share of interviews that would have to change pattern for the
+# two versions to match (total variation distance). No pattern is named in advance, and the reshuffles need no
+# assumption about how respondents resemble one another. Interviewers are reshuffled independently, so under
+# the null the chance that any of m interviewers reaches p is 1 - (1 - p)^m.
+arm_switch_test <- function(respondents, permutations = 9999L, seed = 1L) {
+  answers <- respondent_answers(respondents)
+  answers <- answers[answers$arm != "mixed", ]
+  set.seed(seed)
+  rows <- lapply(split(answers, answers$interviewer), function(own) {
+    control <- own$arm == "control"
+    if (all(control) || !any(control)) {
+      return(NULL)
+    }
+    indicator <- outer(own$pattern, unique(own$pattern), "==") * 1
+    distance <- function(labels) {
+      in_control <- crossprod(indicator, labels)
+      0.5 * colSums(abs(in_control / sum(control) - (colSums(indicator) - in_control) / sum(!control)))
+    }
+    observed <- distance(matrix(control))
+    null <- distance(replicate(permutations, sample(control)))
+    data.frame(
+      interviewer = own$interviewer[1], interviews = nrow(own), distance = observed,
+      lower = stats::quantile(null, 0.025, names = FALSE), middle = stats::median(null),
+      upper = stats::quantile(null, 0.975, names = FALSE),
+      p = (1 + sum(null >= observed - 1e-9)) / (1 + permutations),
+      change = (mean(own$total[!control]) - mean(own$total[control])) / 16,
+      modal = max(table(own$pattern)) / nrow(own)
+    )
+  })
+  tests <- do.call(rbind, rows)
+  tests$p_family <- 1 - (1 - tests$p)^nrow(tests)
+  tests$suspect <- tests$interviewer %in% suspect_interviewers
+  attr(tests, "permutations") <- permutations
+  tests
 }
 
 # For each respondent, the highest share of jointly answered questions on which another respondent in the same
@@ -396,6 +516,7 @@ analyze_responses <- function(respondents, posteriors, questionnaire = read.csv(
     mean(restricted$response[restricted$endorser == "a"])
   list(
     screen = screen, midpoint_counts = midpoint_counts(samples$full), summaries = summaries,
+    blocks = block_test(samples$full), switch = arm_switch_test(samples$full),
     effects = interviewer_effects(reshape_responses(samples$full)), matches = matches,
     respondents = nrow(respondents), responses = responses, control = control, treated = treated,
     alpha = alpha, beta = beta, se = clustered_ate_se(responses),
