@@ -89,7 +89,7 @@ write_tables <- function(analysis) {
   )
   blair <- analysis$blair
   with_se <- function(estimate, se) paste0("$", fmt(estimate, "scale"), "$ (", fmt(se, "scale"), ")")
-  source <- paste0("Table ", blair$table, ifelse(blair$table %in% c(1L, 3L), "", paste0(", col. ", blair$column)))
+  source <- paste0("Table ", blair$table, ifelse(blair$table == 1L, "", paste0(", col. ", blair$column)))
   write_table(
     "blair_findings", c("Blair et al.", "Quantity", "All interviews", "Without 7, 37, 71"),
     cbind(source, blair$label, with_se(blair$estimate, blair$se), with_se(blair$estimate_without, blair$se_without)),
@@ -383,6 +383,7 @@ paper_numbers <- function(analysis) {
   gap <- pick(2L, 1L, "^Gap")
   gap_controls <- pick(2L, 3L, "^Gap")
   gaps <- blair[blair$table == 2L & grepl("^Gap", blair$label), ]
+  gaps_controls <- gaps[gaps$column > 1L, ]
   middle <- pick(2L, 1L, "^Effect, middle")
   low <- pick(2L, 1L, "^Effect, low")
   cues <- blair[blair$table == 1L, ]
@@ -390,8 +391,15 @@ paper_numbers <- function(analysis) {
   urban_low <- pick(4L, 3L, "urban low")
   urban_gap <- pick(4L, 3L, "^Gap")
   violent <- blair[blair$table == 5L, ]
+  other_gaps <- blair[blair$table %in% 4:5 & grepl("^Gap", blair$label), ]
   placebo <- attr(blair, "placebo")
+  exclusions <- attr(blair, "exclusions")
+  unflagged <- exclusions[exclusions$exclusion == "flagged", ]
+  unduplicated <- exclusions[exclusions$exclusion == "duplicated", ]
   three <- attr(blair, "three")
+  t_stat <- function(estimate, se) fmt(abs(estimate / se), "statistic")
+  # Group names appear mid-sentence; only the sectarian label is a common noun.
+  cue_group <- function(label) sub("^Sectarian", "sectarian", sub("^Endorsement effect, ", "", label))
   scale <- function(value) paste0("$", fmt(value, "scale"), "$")
   cost <- function(value) fmt(-blair_scale * value, "points")
   none_or_count <- function(value) if (round(value) == 0) "none" else count(round(value))
@@ -403,8 +411,22 @@ paper_numbers <- function(analysis) {
     BlairGapControlsFull = scale(gap_controls$estimate), BlairGapControlsFullSE = fmt(gap_controls$se, "scale"),
     BlairGapControlsWithout = scale(gap_controls$estimate_without),
     BlairGapControlsWithoutSE = fmt(gap_controls$se_without, "scale"),
+    BlairGapControlsFullMin = scale(max(gaps_controls$estimate)),
+    BlairGapControlsFullMax = scale(min(gaps_controls$estimate)),
+    BlairGapControlsWithoutMin = scale(max(gaps_controls$estimate_without)),
+    BlairGapControlsWithoutMax = scale(min(gaps_controls$estimate_without)),
     BlairGapCutMin = min(cut(gaps)), BlairGapCutMax = max(cut(gaps)),
-    BlairGapTWithoutMax = fmt(max(abs(gaps$estimate_without / gaps$se_without)), "statistic"),
+    BlairGapTWithoutMax = t_stat(max(abs(gaps$estimate_without / gaps$se_without)), 1),
+    BlairGapTFirstFull = t_stat(gap$estimate, gap$se),
+    BlairGapTFirstWithout = t_stat(gap$estimate_without, gap$se_without),
+    BlairGapTControlsFullMin = t_stat(min(abs(gaps_controls$estimate / gaps_controls$se)), 1),
+    BlairGapTControlsFullMax = t_stat(max(abs(gaps_controls$estimate / gaps_controls$se)), 1),
+    BlairGapTControlsWithoutMin = t_stat(min(abs(gaps_controls$estimate_without / gaps_controls$se_without)), 1),
+    BlairGapTControlsWithoutMax = t_stat(max(abs(gaps_controls$estimate_without / gaps_controls$se_without)), 1),
+    BlairGapUnflagged = scale(unflagged$estimate), BlairGapUnflaggedSE = fmt(unflagged$se, "scale"),
+    BlairFlaggedInterviewers = count(unflagged$interviewers),
+    BlairGapUnduplicated = scale(unduplicated$estimate), BlairGapUnduplicatedSE = fmt(unduplicated$se, "scale"),
+    BlairDuplicatedInterviewers = count(unduplicated$interviewers),
     BlairMiddleFull = scale(middle$estimate), BlairMiddleFullSE = fmt(middle$se, "scale"),
     BlairMiddleWithout = scale(middle$estimate_without), BlairMiddleWithoutSE = fmt(middle$se_without, "scale"),
     BlairMiddleWithoutPoints = cost(middle$estimate_without),
@@ -412,6 +434,8 @@ paper_numbers <- function(analysis) {
     BlairLowWithoutPoints = cost(low$estimate_without),
     BlairCueFullMin = cost(max(cues$estimate)), BlairCueFullMax = cost(min(cues$estimate)),
     BlairCueWithoutMin = cost(max(cues$estimate_without)), BlairCueWithoutMax = cost(min(cues$estimate_without)),
+    BlairCueWeakest = cue_group(cues$label[which.max(cues$estimate)]),
+    BlairCueStrongest = cue_group(cues$label[which.min(cues$estimate)]),
     BlairDistrictGapFull = scale(pick(3L, 1L, "^Gap")$estimate),
     BlairDistrictGapWithout = scale(pick(3L, 1L, "^Gap")$estimate_without),
     BlairUrbanMiddleFull = scale(urban_middle$estimate), BlairUrbanMiddleFullSE = fmt(urban_middle$se, "scale"),
@@ -423,11 +447,18 @@ paper_numbers <- function(analysis) {
     BlairViolentFull = scale(violent$estimate[1]), BlairViolentWithout = scale(violent$estimate_without[1]),
     BlairViolentWithoutSE = fmt(violent$se_without[1], "scale"),
     BlairViolentCutMin = min(cut(violent)), BlairViolentCutMax = max(cut(violent)),
+    BlairOtherCutMin = min(cut(other_gaps)), BlairOtherCutMax = max(cut(other_gaps)),
     BlairPlaceboDraws = count(placebo$draws[1]),
     BlairPlaceboGapLower = scale(placebo$lower[1]), BlairPlaceboGapUpper = scale(placebo$upper[1]),
     BlairPlaceboGapCount = none_or_count(placebo$share_as_close[1] * placebo$draws[1]),
     BlairPlaceboUrbanCount = none_or_count(placebo$share_as_close[2] * placebo$draws[2]),
+    BlairPlaceboAsLargeCount = count(round(placebo$share_as_large[1] * placebo$draws[1])),
+    BlairPlaceboGapCountAsLarge = none_or_count(
+      placebo$share_as_close_as_large[1] * placebo$share_as_large[1] * placebo$draws[1]
+    ),
     BlairThreeIncomeRespondents = count(three[["respondents"]]), BlairThreeNotLow = fmt(three[["not_low"]], "percent"),
+    BlairThreeMiddle = fmt(three[["middle"]], "percent"), BlairThreeHigh = fmt(three[["high"]], "percent"),
+    BlairThreeShareOfMiddle = fmt(three[["share_of_middle"]], "percent"),
     BlairNFull = count(gap$n), BlairNWithout = count(gap$n_without)
   )
   values <- c(values,
@@ -466,17 +497,18 @@ write_readme_results <- function(values) {
   lines <- c(
     paste0(
       "Three of the survey's ", value("InterviewerCount"), " interviewers (", value("SuspectShare"), " of interviews) ",
-      "recorded one answer pattern in most of their interviews. Their interviews, almost all with middle- and ",
-      "high-income respondents, make those respondents look warmer toward militant groups and produce the ",
+      "recorded near-identical answer strings in most of their interviews. Their interviews, almost all with ",
+      "middle- and high-income respondents, make those respondents look warmer toward militant groups and produce the ",
       "apparent movement in both directions that the published data show."
     ), "",
     paste0(
-      "- **Blair et al.'s central estimate does not survive.** The gap between the poor's and the middle class's ",
+      "- **Blair et al.'s central estimate does not hold up.** The gap between the poor's and the middle class's ",
       "reactions to an endorsement (their Table 2) moves from ", value("BlairGapFull"), " (SE ",
       value("BlairGapFullSE"), ") to ", value("BlairGapWithout"), " (", value("BlairGapWithoutSE"),
-      ") without the three interviewers, and is not distinguishable from zero in any of their specifications. ",
-      "The poor's reaction is unchanged; the middle class's moves from ", value("BlairMiddleFull"), " to ",
-      value("BlairMiddleWithout"), ". The urban-poor and violent-district contrasts shrink by about a third."
+      ") without the three interviewers, and is not distinguishable from zero in any of the four specifications ",
+      "of that table. The poor's reaction barely changes; the middle class's moves from ", value("BlairMiddleFull"),
+      " to ", value("BlairMiddleWithout"), ". The urban-poor and violent-district contrasts shrink by ",
+      value("BlairOtherCutMin"), " to ", value("BlairOtherCutMax"), "."
     ),
     paste0(
       "- **With all interviews,** endorsements lower policy support by ", value("FullATE"), " on the 0–1 scale ",

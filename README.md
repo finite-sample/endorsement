@@ -12,9 +12,9 @@ Blair et al. conclude that poor Pakistanis dislike militant groups more than the
 
 <!-- BEGIN GENERATED RESULTS -->
 
-Three of the survey's 75 interviewers (5.7% of interviews) recorded one answer pattern in most of their interviews. Their interviews, almost all with middle- and high-income respondents, make those respondents look warmer toward militant groups and produce the apparent movement in both directions that the published data show.
+Three of the survey's 75 interviewers (5.7% of interviews) recorded near-identical answer strings in most of their interviews. Their interviews, almost all with middle- and high-income respondents, make those respondents look warmer toward militant groups and produce the apparent movement in both directions that the published data show.
 
-- **Blair et al.'s central estimate does not survive.** The gap between the poor's and the middle class's reactions to an endorsement (their Table 2) moves from -0.018 (SE 0.010) to -0.008 (0.010) without the three interviewers, and is not distinguishable from zero in any of their specifications. The poor's reaction is unchanged; the middle class's moves from -0.001 to -0.013. The urban-poor and violent-district contrasts shrink by about a third.
+- **Blair et al.'s central estimate does not hold up.** The gap between the poor's and the middle class's reactions to an endorsement (their Table 2) moves from -0.018 (SE 0.010) to -0.008 (0.010) without the three interviewers, and is not distinguishable from zero in any of the four specifications of that table. The poor's reaction barely changes; the middle class's moves from -0.001 to -0.013. The urban-poor and violent-district contrasts shrink by 22% to 33%.
 - **With all interviews,** endorsements lower policy support by -0.013 on the 0–1 scale (interviewer-clustered SE 0.007).
 - **Without the three interviewers,** the effect is -0.021 (SE 0.005), the apparent movement out of the middle of the scale in both directions disappears, and the measurement model's share of favorable reactions moves from 43% to 38%, within the uncertainty of either estimate.
 - **How many respondents react favorably is not identified by the data.** With a mean reaction near zero, the model's share follows from its assumption that reactions are normally distributed; a population in which no one reacts favorably fits as well.

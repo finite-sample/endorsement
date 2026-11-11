@@ -471,11 +471,17 @@ sample_summary <- function(respondents, draws = 1000L, seed = 1L) {
 }
 
 analyze_responses <- function(respondents, posteriors, questionnaire = read.csv("data/questionnaire.csv"),
-                              blair = blair_reanalysis(blair_sample())) {
+                              blair = blair_sample()) {
   screen <- interviewer_screen(respondents)
   flagged <- screen$interviewer[screen$flagged]
   matches <- village_matches(questionnaire)
   duplicated <- matches$duplicates$interviewer
+  # Blair et al.'s estimates are also recomputed without the other interviewers the screens single out.
+  if (nrow(blair) > 0) {
+    blair <- blair_reanalysis(blair, exclusions = list(
+      flagged = flagged, duplicated = union(suspect_interviewers, duplicated)
+    ))
+  }
   samples <- list(
     full = respondents, clean = respondents[!respondents$interviewer %in% suspect_interviewers, ],
     unflagged = respondents[!respondents$interviewer %in% flagged, ],

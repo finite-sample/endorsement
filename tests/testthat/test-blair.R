@@ -27,32 +27,36 @@ test_that("full-sample estimates reproduce the published tables to the third dec
     label = estimates$label, column = estimates$column,
     estimate = c(
       -0.011, -0.015, -0.010, -0.008,
-      -0.001, -0.019, -0.018, 0.001, -0.022, -0.023,
-      -0.015,
+      -0.001, -0.019, -0.018, -0.002, -0.022, -0.020, 0.001, -0.022, -0.023, -0.020,
+      -0.015, -0.010, -0.007, -0.013,
       0.019, -0.042, -0.055,
       -0.052, -0.061
     ),
     se = c(
       0.006, 0.006, 0.005, 0.005,
-      0.006, 0.008, 0.010, 0.005, 0.008, 0.009,
-      0.010,
+      0.006, 0.008, 0.010, 0.005, 0.008, 0.010, 0.005, 0.008, 0.009, 0.009,
+      0.010, 0.010, 0.010, 0.010,
       0.009, 0.013, 0.020,
       0.015, 0.015
     ),
-    n = c(rep(5358L, 4), rep(5067L, 3), rep(4978L, 3), 4925L, rep(4978L, 3), 1265L, 1117L)
+    n = c(
+      rep(5358L, 4), rep(5067L, 6), rep(4978L, 4), 4925L, 4925L, 4837L, 4837L, rep(4978L, 3), 1265L, 1117L
+    )
   )
-  # The one known discrepancy: the cue by low-income-district interaction in their Table 3 comes out 0.0006 more
-  # negative than published, in every column, while the table's other coefficients match exactly.
+  # The one known discrepancy: the cue by low-income-district interaction in their Table 3 comes out 0.0006 to
+  # 0.0008 more negative than published in each of its four columns, so each rounds 0.001 lower, and its
+  # first-column standard error rounds to 0.011 against 0.010; the table's other coefficients match exactly.
   district <- estimates$table == 3L
   expect_equal(round(estimates$estimate[!district], 3), published$estimate[!district])
   expect_equal(round(estimates$se[!district], 3), published$se[!district])
-  expect_equal(round(estimates$estimate[district], 3), published$estimate[district], tolerance = 0.001 / 0.015)
+  expect_equal(round(estimates$estimate[district], 3), published$estimate[district] - 0.001)
+  expect_equal(round(estimates$se[district], 3), published$se[district] + c(0.001, 0, 0, 0))
   expect_equal(estimates$n, published$n)
 })
 
 test_that("the reanalysis pairs each quantity with its value without the three interviewers", {
-  results <- blair_reanalysis(blair, draws = 5L)
-  expect_equal(nrow(results), 16L)
+  results <- blair_reanalysis(blair, draws = 5L, exclusions = list(more = c(suspect_interviewers, 1L)))
+  expect_equal(nrow(results), 23L)
   expect_true(all(results$n_without < results$n))
   gap <- results[results$table == 2L & results$column == 1L & grepl("^Gap", results$label), ]
   expect_lt(gap$estimate, gap$estimate_without)
@@ -63,5 +67,12 @@ test_that("the reanalysis pairs each quantity with its value without the three i
   expect_equal(nrow(placebo), 2L)
   expect_true(all(placebo$draws == 5L))
   expect_true(all(placebo$lower <= placebo$upper))
-  expect_gt(attr(results, "three")[["not_low"]], 0.95)
+  expect_true(all(placebo$share_as_large >= 0 & placebo$share_as_large <= 1))
+  exclusions <- attr(results, "exclusions")
+  expect_equal(exclusions$exclusion, "more")
+  expect_equal(exclusions$interviewers, 4L)
+  expect_lt(exclusions$n, gap$n_without)
+  three <- attr(results, "three")
+  expect_gt(three[["not_low"]], 0.95)
+  expect_equal(three[["not_low"]], three[["middle"]] + three[["high"]])
 })

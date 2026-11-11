@@ -107,10 +107,11 @@ blair_sample <- function(directory = "data/dataverse") {
 }
 
 # Blair et al.'s specifications: province fixed effects (column 1), plus demographic controls (2), plus
-# attitudinal controls (3).
+# attitudinal controls (3), plus interactions of the cue with every control (4).
 blair_controls <- function(column) {
-  stopifnot(column %in% 1:3)
-  c("factor(province)", if (column >= 2) blair_demographics, if (column >= 3) blair_attitudes)
+  stopifnot(column %in% 1:4)
+  controls <- c("factor(province)", if (column >= 2) blair_demographics, if (column >= 3) blair_attitudes)
+  c(controls, if (column == 4) paste0("treatment:", controls))
 }
 
 # A linear combination of coefficients from a survey-weighted regression with the design Blair et al. use:
@@ -140,17 +141,24 @@ blair_quantities <- function() {
         outcome = paste0("support_", index), weight = paste0("weight_", index)
       )
     }),
-    unlist(lapply(c(1L, 3L), function(column) {
-      list(
-        quantity(2L, column, "Effect, middle income", income, combination = "treatment"),
-        quantity(2L, column, "Effect, low income", income, combination = c("treatment", "treatment:low")),
-        quantity(2L, column, "Gap: low minus middle income", income, combination = "treatment:low")
+    # Their fourth column interacts the cue with every control, so it reports the gap but no group effects.
+    unlist(lapply(1:4, function(column) {
+      c(
+        if (column < 4) {
+          list(
+            quantity(2L, column, "Effect, middle income", income, combination = "treatment"),
+            quantity(2L, column, "Effect, low income", income, combination = c("treatment", "treatment:low"))
+          )
+        },
+        list(quantity(2L, column, "Gap: low minus middle income", income, combination = "treatment:low"))
       )
     }), recursive = FALSE),
-    list(quantity(3L, 1L, "Gap: low- minus middle-income district",
-      c("treatment", "low_district", "high_district", "treatment:low_district", "treatment:high_district"),
-      combination = "treatment:low_district"
-    )),
+    lapply(1:4, function(column) {
+      quantity(3L, column, "Gap: low- minus middle-income district",
+        c("treatment", "low_district", "high_district", "treatment:low_district", "treatment:high_district"),
+        combination = "treatment:low_district"
+      )
+    }),
     list(
       quantity(4L, 3L, "Effect, urban middle income", urban, combination = c("treatment", "treatment:urban")),
       quantity(4L, 3L, "Effect, urban low income", urban,
@@ -189,9 +197,10 @@ blair_estimates <- function(sample, quantities = blair_quantities()) {
   do.call(rbind, rows)
 }
 
-# Each published quantity with and without the three interviewers, and, for the central estimates, how far
-# dropping three interviewers chosen at random moves them.
-blair_reanalysis <- function(sample, draws = 1000L, seed = 1L) {
+# Each published quantity with and without the three interviewers; for the central estimates, how far dropping
+# three interviewers chosen at random moves them; and the Table 2 gap without other sets of interviewers
+# (`exclusions`, a named list of interviewer identifiers).
+blair_reanalysis <- function(sample, draws = 1000L, seed = 1L, exclusions = list()) {
   quantities <- blair_quantities()
   full <- blair_estimates(sample, quantities)
   without <- blair_estimates(sample[!sample$interviewer %in% suspect_interviewers, ], quantities)
@@ -205,22 +214,38 @@ blair_reanalysis <- function(sample, draws = 1000L, seed = 1L) {
   interviewers <- unique(stats::na.omit(sample$interviewer))
   set.seed(seed)
   triples <- replicate(draws, sample(interviewers, 3L), simplify = FALSE)
+  # A random triple usually removes fewer interviews than the three, so the comparison is also made among the
+  # triples that remove at least as many respondents from the central estimate's sample.
   placebo <- do.call(rbind, lapply(central, function(index) {
     quantity <- quantities[[index]]
     estimates <- sapply(triples, function(dropped) {
-      blair_quantity(sample[!sample$interviewer %in% dropped, ], quantity)[["estimate"]]
+      blair_quantity(sample[!sample$interviewer %in% dropped, ], quantity)
     })
+    removed <- results$n[index] - estimates["n", ]
+    as_large <- removed >= results$n[index] - results$n_without[index]
+    as_close <- estimates["estimate", ] >= results$estimate_without[index]
     data.frame(
-      label = quantity$label, draws = draws, lower = unname(stats::quantile(estimates, 0.05)),
-      upper = unname(stats::quantile(estimates, 0.95)),
-      share_as_close = mean(estimates >= results$estimate_without[index])
+      label = quantity$label, draws = draws, lower = unname(stats::quantile(estimates["estimate", ], 0.05)),
+      upper = unname(stats::quantile(estimates["estimate", ], 0.95)),
+      share_as_close = mean(as_close), share_as_large = mean(as_large),
+      share_as_close_as_large = if (any(as_large)) mean(as_close[as_large]) else NA_real_
     )
   }))
-  three <- sample[sample$interviewer %in% suspect_interviewers & !is.na(sample$low), ]
+  gap <- quantities[[central[1]]]
+  others <- do.call(rbind, lapply(names(exclusions), function(name) {
+    kept <- sample[!sample$interviewer %in% exclusions[[name]], ]
+    cbind(data.frame(exclusion = name, interviewers = length(intersect(exclusions[[name]], interviewers))),
+      t(blair_quantity(kept, gap))
+    )
+  }))
+  with_income <- sample[!is.na(sample$low), ]
+  three <- with_income[with_income$interviewer %in% suspect_interviewers, ]
   attr(results, "placebo") <- placebo
+  attr(results, "exclusions") <- others
   attr(results, "three") <- c(
-    respondents = nrow(three), not_low = mean(three$low == 0), urban = mean(three$urban == 1),
-    violent = mean(three$incidents > 0)
+    respondents = nrow(three), not_low = mean(three$low == 0), middle = mean(three$low == 0 & three$high == 0),
+    high = mean(three$high == 1), urban = mean(three$urban == 1), violent = mean(three$incidents > 0),
+    share_of_middle = sum(three$low == 0 & three$high == 0) / sum(with_income$low == 0 & with_income$high == 0)
   )
   results
 }
