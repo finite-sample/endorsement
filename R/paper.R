@@ -87,6 +87,14 @@ write_tables <- function(analysis) {
       cell("spread"), cell("midpoint"), cell("below"), cell("above")
     ), "lrrrrrrr", c(2L, 5L)
   )
+  blair <- analysis$blair
+  with_se <- function(estimate, se) paste0("$", fmt(estimate, "scale"), "$ (", fmt(se, "scale"), ")")
+  source <- paste0("Table ", blair$table, ifelse(blair$table %in% c(1L, 3L), "", paste0(", col. ", blair$column)))
+  write_table(
+    "blair_findings", c("Blair et al.", "Quantity", "All interviews", "Without 7, 37, 71"),
+    cbind(source, blair$label, with_se(blair$estimate, blair$se), with_se(blair$estimate_without, blair$se_without)),
+    "llrr", breaks = which(diff(blair$table) != 0) + 1L, separator = "\\addlinespace"
+  )
   rows <- lapply(names(specifications), function(spec) {
     posterior <- analysis$posteriors[[spec]]
     cbind(
@@ -366,6 +374,62 @@ paper_numbers <- function(analysis) {
     SwitchSuspectModalMin = fmt(min(switch$modal[switch$suspect]), "percent"),
     SwitchOtherShare = fmt(mean(switch$p[!switch$suspect] < 0.05), "percent")
   )
+  blair <- analysis$blair
+  pick <- function(table, column, pattern) {
+    row <- blair[blair$table == table & blair$column == column & grepl(pattern, blair$label), ]
+    stopifnot(nrow(row) == 1L)
+    row
+  }
+  gap <- pick(2L, 1L, "^Gap")
+  gap_controls <- pick(2L, 3L, "^Gap")
+  gaps <- blair[blair$table == 2L & grepl("^Gap", blair$label), ]
+  middle <- pick(2L, 1L, "^Effect, middle")
+  low <- pick(2L, 1L, "^Effect, low")
+  cues <- blair[blair$table == 1L, ]
+  urban_middle <- pick(4L, 3L, "urban middle")
+  urban_low <- pick(4L, 3L, "urban low")
+  urban_gap <- pick(4L, 3L, "^Gap")
+  violent <- blair[blair$table == 5L, ]
+  placebo <- attr(blair, "placebo")
+  three <- attr(blair, "three")
+  scale <- function(value) paste0("$", fmt(value, "scale"), "$")
+  cost <- function(value) fmt(-blair_scale * value, "points")
+  none_or_count <- function(value) if (round(value) == 0) "none" else count(round(value))
+  cut <- function(rows) fmt(1 - rows$estimate_without / rows$estimate, "percent")
+  values <- c(values,
+    BlairGapFull = scale(gap$estimate), BlairGapFullSE = fmt(gap$se, "scale"),
+    BlairGapWithout = scale(gap$estimate_without), BlairGapWithoutSE = fmt(gap$se_without, "scale"),
+    BlairGapFullPoints = cost(gap$estimate), BlairGapWithoutPoints = cost(gap$estimate_without),
+    BlairGapControlsFull = scale(gap_controls$estimate), BlairGapControlsFullSE = fmt(gap_controls$se, "scale"),
+    BlairGapControlsWithout = scale(gap_controls$estimate_without),
+    BlairGapControlsWithoutSE = fmt(gap_controls$se_without, "scale"),
+    BlairGapCutMin = min(cut(gaps)), BlairGapCutMax = max(cut(gaps)),
+    BlairGapTWithoutMax = fmt(max(abs(gaps$estimate_without / gaps$se_without)), "statistic"),
+    BlairMiddleFull = scale(middle$estimate), BlairMiddleFullSE = fmt(middle$se, "scale"),
+    BlairMiddleWithout = scale(middle$estimate_without), BlairMiddleWithoutSE = fmt(middle$se_without, "scale"),
+    BlairMiddleWithoutPoints = cost(middle$estimate_without),
+    BlairLowFull = scale(low$estimate), BlairLowWithout = scale(low$estimate_without),
+    BlairLowWithoutPoints = cost(low$estimate_without),
+    BlairCueFullMin = cost(max(cues$estimate)), BlairCueFullMax = cost(min(cues$estimate)),
+    BlairCueWithoutMin = cost(max(cues$estimate_without)), BlairCueWithoutMax = cost(min(cues$estimate_without)),
+    BlairDistrictGapFull = scale(pick(3L, 1L, "^Gap")$estimate),
+    BlairDistrictGapWithout = scale(pick(3L, 1L, "^Gap")$estimate_without),
+    BlairUrbanMiddleFull = scale(urban_middle$estimate), BlairUrbanMiddleFullSE = fmt(urban_middle$se, "scale"),
+    BlairUrbanMiddleWithout = scale(urban_middle$estimate_without),
+    BlairUrbanLowFull = scale(urban_low$estimate), BlairUrbanLowWithout = scale(urban_low$estimate_without),
+    BlairUrbanGapFull = scale(urban_gap$estimate), BlairUrbanGapFullSE = fmt(urban_gap$se, "scale"),
+    BlairUrbanGapWithout = scale(urban_gap$estimate_without),
+    BlairUrbanGapWithoutSE = fmt(urban_gap$se_without, "scale"), BlairUrbanGapCut = cut(urban_gap),
+    BlairViolentFull = scale(violent$estimate[1]), BlairViolentWithout = scale(violent$estimate_without[1]),
+    BlairViolentWithoutSE = fmt(violent$se_without[1], "scale"),
+    BlairViolentCutMin = min(cut(violent)), BlairViolentCutMax = max(cut(violent)),
+    BlairPlaceboDraws = count(placebo$draws[1]),
+    BlairPlaceboGapLower = scale(placebo$lower[1]), BlairPlaceboGapUpper = scale(placebo$upper[1]),
+    BlairPlaceboGapCount = none_or_count(placebo$share_as_close[1] * placebo$draws[1]),
+    BlairPlaceboUrbanCount = none_or_count(placebo$share_as_close[2] * placebo$draws[2]),
+    BlairThreeIncomeRespondents = count(three[["respondents"]]), BlairThreeNotLow = fmt(three[["not_low"]], "percent"),
+    BlairNFull = count(gap$n), BlairNWithout = count(gap$n_without)
+  )
   values <- c(values,
     CorrelationsRising = as.character(nrow(rising)),
     CorrelationsExcludingZero = as.character(sum(moments$lower > 0 | moments$upper < 0)),
@@ -402,9 +466,18 @@ write_readme_results <- function(values) {
   lines <- c(
     paste0(
       "Three of the survey's ", value("InterviewerCount"), " interviewers (", value("SuspectShare"), " of interviews) ",
-      "recorded one answer pattern in most of their interviews. Their interviews make respondents look warmer ",
-      "toward militant groups and produce the apparent movement in both directions that the published data show."
+      "recorded one answer pattern in most of their interviews. Their interviews, almost all with middle- and ",
+      "high-income respondents, make those respondents look warmer toward militant groups and produce the ",
+      "apparent movement in both directions that the published data show."
     ), "",
+    paste0(
+      "- **Blair et al.'s central estimate does not survive.** The gap between the poor's and the middle class's ",
+      "reactions to an endorsement (their Table 2) moves from ", value("BlairGapFull"), " (SE ",
+      value("BlairGapFullSE"), ") to ", value("BlairGapWithout"), " (", value("BlairGapWithoutSE"),
+      ") without the three interviewers, and is not distinguishable from zero in any of their specifications. ",
+      "The poor's reaction is unchanged; the middle class's moves from ", value("BlairMiddleFull"), " to ",
+      value("BlairMiddleWithout"), ". The urban-poor and violent-district contrasts shrink by about a third."
+    ),
     paste0(
       "- **With all interviews,** endorsements lower policy support by ", value("FullATE"), " on the 0–1 scale ",
       "(interviewer-clustered SE ", value("FullSE"), ")."
@@ -416,8 +489,9 @@ write_readme_results <- function(values) {
       " to ", value("PrimaryShare"), ", within the uncertainty of either estimate."
     ),
     paste0(
-      "- **How many respondents react favorably is not identified by the data.** The model's share rests on its ",
-      "assumption that reactions are normally distributed."
+      "- **How many respondents react favorably is not identified by the data.** With a mean reaction near ",
+      "zero, the model's share follows from its assumption that reactions are normally distributed; a population ",
+      "in which no one reacts favorably fits as well."
     )
   )
   readme <- readLines("README.md", warn = FALSE)

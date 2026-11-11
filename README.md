@@ -6,17 +6,18 @@ Reanalysis of Blair, Fair, Malhotra, and Shapiro (2013), "Poverty and Support fo
 
 ## Findings
 
-Blair et al. read a small negative endorsement effect as evidence that Pakistanis hold militant groups in low regard. In their data, respondents also appear to leave the middle of the scale in both directions under endorsement, as offsetting reactions would produce. Both features trace to three interviewers.
+Blair et al. conclude that poor Pakistanis dislike militant groups more than the middle class does, and read a small negative endorsement effect as evidence that Pakistanis hold the groups in low regard. In their data, respondents also appear to leave the middle of the scale in both directions under endorsement, as offsetting reactions would produce. All three features trace to three interviewers. Their published Tables 1–5 are rebuilt here from their replication files (`R/blair.R`) and recomputed without those interviewers.
 
 ![The survey's interviewers](figs/interviewers.png)
 
 <!-- BEGIN GENERATED RESULTS -->
 
-Three of the survey's 75 interviewers (5.7% of interviews) recorded one answer pattern in most of their interviews. Their interviews make respondents look warmer toward militant groups and produce the apparent movement in both directions that the published data show.
+Three of the survey's 75 interviewers (5.7% of interviews) recorded one answer pattern in most of their interviews. Their interviews, almost all with middle- and high-income respondents, make those respondents look warmer toward militant groups and produce the apparent movement in both directions that the published data show.
 
+- **Blair et al.'s central estimate does not survive.** The gap between the poor's and the middle class's reactions to an endorsement (their Table 2) moves from -0.018 (SE 0.010) to -0.008 (0.010) without the three interviewers, and is not distinguishable from zero in any of their specifications. The poor's reaction is unchanged; the middle class's moves from -0.001 to -0.013. The urban-poor and violent-district contrasts shrink by about a third.
 - **With all interviews,** endorsements lower policy support by -0.013 on the 0–1 scale (interviewer-clustered SE 0.007).
 - **Without the three interviewers,** the effect is -0.021 (SE 0.005), the apparent movement out of the middle of the scale in both directions disappears, and the measurement model's share of favorable reactions moves from 43% to 38%, within the uncertainty of either estimate.
-- **How many respondents react favorably is not identified by the data.** The model's share rests on its assumption that reactions are normally distributed.
+- **How many respondents react favorably is not identified by the data.** With a mean reaction near zero, the model's share follows from its assumption that reactions are normally distributed; a population in which no one reacts favorably fits as well.
 
 <!-- END GENERATED RESULTS -->
 
@@ -52,6 +53,7 @@ Endorser codes, confirmed against Blair et al.'s Table 1: a = control, b = Kashm
 R/
   data.R       Input validation, factor coding, and response reshaping
   analysis.R   Interviewer screen, effects, within-respondent patterns, simulated worlds, and bounds
+  blair.R      Blair et al.'s Tables 1-5 rebuilt from their Stata code, with and without the three interviewers
   model.R      Three-chain measurement-model fitting and posterior summaries
   paper.R      Tables, the interviewer figure, numerical macros, and README results
 scripts/run.R  Single entry point: prepare, fit, summarize, analysis

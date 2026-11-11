@@ -48,7 +48,9 @@ test_that("mixed-arm cluster covariance matches the full matrix sandwich", {
 })
 
 test_that("headline estimates exclude the three interviewers and match recorded values", {
-  analysis <- analyze_responses(respondents, list(), read.csv(file.path(root, "data", "questionnaire.csv")))
+  analysis <- analyze_responses(
+    respondents, list(), read.csv(file.path(root, "data", "questionnaire.csv")), blair = data.frame()
+  )
   expect_equal(analysis$respondents, 5166L)
   expect_equal(length(analysis$control), 10364L)
   expect_equal(length(analysis$treated), 10300L)

@@ -11,7 +11,8 @@ Imports:
     coda,
     endorse,
     foreign,
-    ggplot2
+    ggplot2,
+    survey
 Suggests:
     lintr,
     renv,

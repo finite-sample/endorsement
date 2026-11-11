@@ -470,7 +470,8 @@ sample_summary <- function(respondents, draws = 1000L, seed = 1L) {
   )
 }
 
-analyze_responses <- function(respondents, posteriors, questionnaire = read.csv("data/questionnaire.csv")) {
+analyze_responses <- function(respondents, posteriors, questionnaire = read.csv("data/questionnaire.csv"),
+                              blair = blair_reanalysis(blair_sample())) {
   screen <- interviewer_screen(respondents)
   flagged <- screen$interviewer[screen$flagged]
   matches <- village_matches(questionnaire)
@@ -519,7 +520,7 @@ analyze_responses <- function(respondents, posteriors, questionnaire = read.csv(
   clean_ate <- mean(restricted$response[restricted$endorser != "a"]) -
     mean(restricted$response[restricted$endorser == "a"])
   list(
-    screen = screen, midpoint_counts = midpoint_counts(samples$full), summaries = summaries,
+    screen = screen, midpoint_counts = midpoint_counts(samples$full), summaries = summaries, blair = blair,
     blocks = block_test(samples$full), switch = arm_switch_test(samples$full),
     effects = interviewer_effects(single_version), effects_with_mixed = interviewer_effects(full_responses),
     mixed = sum(mixed), matches = matches,
