@@ -1,4 +1,4 @@
-# Do Pakistanis Hold Militant Groups in "Low Regard"?
+# Which Pakistanis Hold Militant Groups in "Low Regard"?
 
 [![ci](https://github.com/finite-sample/endorsement/actions/workflows/ci.yml/badge.svg)](https://github.com/finite-sample/endorsement/actions/workflows/ci.yml)
 
@@ -73,7 +73,7 @@ Calculations live in `R/analysis.R`; `R/paper.R` formats their results. There is
 ## Citation
 
 ```
-Sood, Gaurav. (2026). Do Pakistanis Hold Militant Groups in "Low Regard"?
+Sood, Gaurav. (2026). Which Pakistanis Hold Militant Groups in "Low Regard"? Three Interviewers in Blair et al.'s Endorsement Experiment.
 https://github.com/finite-sample/endorsement
 ```
 
