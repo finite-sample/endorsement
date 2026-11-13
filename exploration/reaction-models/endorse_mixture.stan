@@ -99,7 +99,7 @@ model {
   }
 }
 generated quantities {
-  // shares among responsive respondents; whole-sample bounds let the always-top group be none or all favourable
+  // shares among responsive respondents; whole-sample bounds let the always-top group be none or all favorable
   real top_share = top_class ? w_top[1] : 0;
   real favorable_lower = (1 - top_share) * pi[3];
   real favorable_upper = (1 - top_share) * pi[3] + top_share;

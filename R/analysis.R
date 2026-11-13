@@ -102,7 +102,7 @@ within_respondent_moments <- function(responses, draws = 2000L, seed = 1L) {
 }
 
 # Distribution of each respondent's mean answer across the four policies, by arm. Indifference
-# predicts no change; heterogeneous reactions in both directions move mass away from the centre.
+# predicts no change; heterogeneous reactions in both directions move mass away from the center.
 person_mean_distribution <- function(responses, draws = 2000L, seed = 1L) {
   steps <- length(policies) * 4L
   shares <- function(values) {
@@ -110,7 +110,7 @@ person_mean_distribution <- function(responses, draws = 2000L, seed = 1L) {
   }
   matrix <- respondent_matrix(responses)
   boot <- arm_bootstrap(matrix, shares, draws, seed)
-  # Coarser bins keep the midpoint and its neighbours separate and pool the sparse tails.
+  # Coarser bins keep the midpoint and its neighbors separate and pool the sparse tails.
   edges <- c(-Inf, 6, 7, 8, 9, 10, 13, 15, steps) / steps
   bins <- function(values) {
     tabulate(findInterval(rowMeans(values), edges, left.open = TRUE), nbins = length(edges) - 1L) / nrow(values)
