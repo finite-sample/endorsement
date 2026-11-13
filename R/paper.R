@@ -206,7 +206,7 @@ write_interviewer_figure <- function(screen, path = "figs/interviewers.pdf") {
 write_switch_figure <- function(switch, path = "figs/arm_switch.pdf") {
   accent <- "#c2410c"
   muted <- "#8a8984"
-  # Each interviewer is centred on their own median reshuffled share, because small interviewers have high
+  # Each interviewer is centered on their own median reshuffled share, because small interviewers have high
   # shares by chance and would otherwise dominate the picture.
   switch$excess <- 100 * (switch$distance - switch$middle)
   switch$order <- rank(switch$excess, ties.method = "first")

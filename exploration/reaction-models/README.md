@@ -1,4 +1,4 @@
-# Modelling individual reactions to endorsements: what we tried and why it failed
+# Modeling individual reactions to endorsements: what we tried and why it failed
 
 This folder records an attempt (November 2026) to go beyond the average endorsement effect and estimate
 how individual reactions are distributed: how many respondents react favorably, how many unfavorably, and
@@ -52,7 +52,7 @@ question's loading on it.
 | Two factors (`twofactor`) | Free loadings for the reaction | Loadings poorly identified | Too many free parameters for what four questions can support. |
 | Mixed model (`lme_check.R`, `lme_boot.R`) | Linear, one person effect, variances free by arm | Person-level variance rises by 0.0054 [0.0029, 0.0075]; residual variance falls | Agrees with the Stan models in direction. Ignores the ordinal scale and the ceiling, so it is a cross-check, not an estimate. |
 | Latent classes (`endorse_mixture.stan`, `fit_mixture.py`) | Each respondent is an opponent, indifferent, or a supporter; opponents shift down by delta, supporters up by the same delta (symmetric) | 35% [25, 43] favorable in the dominant mode, but chains split between two explanations | See "Why the latent-class model failed" below. |
-| + bump component (`flex_x=1`) | Lets the position distribution have a lump at the top of the scale | 21% [9, 34] favorable | The answer moves by 14 points depending on how the ceiling is modelled. |
+| + bump component (`flex_x=1`) | Lets the position distribution have a lump at the top of the scale | 21% [9, 34] favorable | The answer moves by 14 points depending on how the ceiling is modeled. |
 | + free magnitudes (`symmetric=0`) | Supporters and opponents shift by different amounts | Every chain ran to a bound (delta_pos = 2, delta_neg about 0.27) | Not identified: a few large positive shifts and many small ones fit equally well. |
 | + always-top class (`top_class=1`) | Respondents answering 5 on all four questions get their own class in both arms (16.4% control, 16.2% endorsed) | Chains disagree; one question's loading runs to 4 or 5 | See below. |
 
